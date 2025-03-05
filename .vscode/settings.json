@@ -1,0 +1,56 @@
+{
+  "latex-workshop.latex.recipes": [
+    {
+      "name": "xelatex -> bibtex -> xelatex x2",
+      "tools": [
+        "xelatex",
+        "bibtex",
+        "xelatex",
+        "xelatex"
+      ]
+    }
+  ],
+  "latex-workshop.latex.tools": [
+    {
+      "name": "xelatex",
+      "command": "xelatex",
+      "args": [
+        "-synctex=1",
+        "-interaction=nonstopmode",
+        "-file-line-error",
+        "-aux-directory=tmp",    // 临时文件输出到 tmp
+        "-output-directory=out",  // PDF 输出到 out
+        "%DOC%"
+      ]
+    },
+    {
+      "name": "bibtex",
+      "command": "bibtex",
+      "args": [
+        "out/%DOCFILE%"          // BibTeX 处理 out 目录下的 .aux 文件
+      ]
+    }
+  ],
+  "latex-workshop.latex.outDir": "./out",         // 指定 PDF 输出目录
+  "latex-workshop.latex.autoBuild.run": "onSave", // 保存时自动编译
+  "latex-workshop.latex.clean.subfolder.enabled": true, // 启用子目录清理
+  "latex-workshop.latex.clean.fileTypes": [       // 清理文件类型
+    "*.aux",
+    "*.bbl",
+    "*.blg",
+    "*.fdb_latexmk",
+    "*.fls",
+    "*.out",
+    "*.toc",
+    "*.xdv",
+    "*.xml",
+    "*.gz",
+    "*.log",
+    "*.synctex.gz"
+  ],
+  "terminal.integrated.commandsToSkipShell": [
+    "language-julia.interrupt"
+  ],
+  "julia.symbolCacheDownload": true,
+  "json.schemas": []
+}

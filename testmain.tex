@@ -1,0 +1,869 @@
+%! TEX program = xelatex
+%! TEX encoding = UTF-8 Unicode
+
+\documentclass[engineeringmaster]{hquThesis}
+
+\usepackage{lineno}
+\usepackage{amsmath,amsfonts,amssymb,textcomp,ulem}
+\usepackage{booktabs,multirow,tabularx,float}
+\usepackage{listings}
+\usepackage{verbatim}
+
+\hypersetup{colorlinks=true,linkcolor=black,citecolor=black}
+
+\begin{document}
+\makecover
+% NOTE: 正式文档请取消下面两行注释
+\include{decision}
+\include{declaration}
+
+\frontmatter{
+    \include{abstract}
+    \tableofcontents
+}
+
+\mainmatter
+\chapter{绪论}
+\section{研究背景和意义}
+\section{国内外研究现状}
+\section{本文研究内容和组织结构}
+
+\chapter{一维拉压杆模型的计算方法}
+
+\section{一维拉压杆模型}
+
+\subsection{平衡微分方程}
+考虑一均匀等截面杆，长度为 \( l \)，横截面积为 \( A \)，弹性模量为 \( E \)。杆的左端固定（位移为零），右端施加拉力 \( F \)，杆整体施加单位长度的体力 \( q \)（假设为常数）。取一微元体，考虑微元的受力平衡：左侧轴力 \( N(x) \)，方向为 \( x \) 轴负方向；右侧轴力 \( N(x + dx) \)，方向为 \( x \) 轴正方向。由 \( x \) 方向的平衡方程有：
+\begin{equation}
+    N(x + dx) - N(x) + q \, dx = 0
+    \label{eq:equilibrium1}
+    \end{equation}
+取极限得：
+\begin{equation}
+    \frac{dN}{dx} = q
+    \label{eq:equilibrium2}
+\end{equation}
+代入轴力表达式：
+\begin{equation}
+    N = EA \frac{du}{dx}
+    \label{eq:axial_force}
+\end{equation}
+方程形式：
+\begin{equation}
+    \frac{d}{dx} \left( EA \frac{du}{dx} \right) = q
+    \label{eq:equilibrium3}
+\end{equation}
+若 \( EA \) 为常数，则：
+\begin{equation}
+    \frac{d^2 u}{dx^2} = \frac{q}{EA}
+    \label{eq:equilibrium4}
+\end{equation}
+
+\subsection{边界条件}
+左端固定：
+\begin{equation}
+    u(0) = 0
+    \label{eq:bc_left}
+\end{equation}
+右端施加拉力：
+\begin{equation}
+    N(l) = EA \frac{du}{dx} \bigg|_{x=l} = F
+    \label{eq:bc_right}
+\end{equation}
+因此对于一维拉压杆模型，其强形式表达式可写为：
+\begin{equation}
+    \left\{
+    \begin{array}{ll}
+    EA \nabla^2 u - q = 0 & \mathrm{in~} (0, l) \\
+    u = 0 & \mathrm{on~} x = 0 \\
+    EA \nabla u = F & \mathrm{on~} x = l
+    \end{array}
+    \right.
+    \label{eq:strong_form_system}
+\end{equation}
+
+\newpage
+\subsection{解析解的推导}
+对 \eqref{eq:equilibrium4} 进行积分：
+\begin{enumerate}
+    \item 第一次积分：
+    \begin{equation}
+    \frac{du}{dx} = \int \frac{q}{EA} \, dx + C_1 = \frac{q}{EA} x + C_1
+    \label{eq:integral1}
+    \end{equation}
+    \item 第二次积分：
+    \begin{equation}
+    u(x) = \int \left( \frac{q}{EA} x + C_1 \right) dx + C_2 = \frac{q}{2EA} x^2 + C_1 x + C_2
+    \label{eq:integral2}
+    \end{equation}
+\end{enumerate}
+应用边界条件：
+\begin{enumerate}
+    \item \(Dirichlet\)边界条件\( u(0) = 0 \)：
+    \[
+    u(0) = \frac{q}{2EA} \cdot 0^2 + C_1 \cdot 0 + C_2 = 0 \implies C_2 = 0
+    \]
+    因此：
+    \begin{equation}
+    u(x) = \frac{q}{2EA} x^2 + C_1 x
+    \label{eq:u_temp}
+    \end{equation}
+    \item \(Neumann\)边界条件\( N(l) = F \)：
+    \[
+    \frac{du}{dx} = \frac{q}{EA} x + C_1, \quad N(l) = EA \left( \frac{q}{EA} l + C_1 \right) = q l + EA C_1 = F
+    \]
+    \[
+    C_1 = \frac{F - q l}{EA}
+    \]
+\end{enumerate}
+代入 \( C_1 \)：
+\begin{equation}
+    u(x) = \frac{q}{2EA} x^2 + \frac{F - q l}{EA} x
+    \label{eq:analytical_solution}
+\end{equation}
+
+
+\newpage
+\section{深度学习计算方法}
+本章运用深度 Ritz 方法对一维线弹性夹紧板模型进行数值计算，深度 Ritz 方法其核心思想是将变分问题转化为优化问题。给出一维线弹性夹紧板模型，对其进行 Ritz 变分，将每一个变分问题都等价的转化为最小化问题，并进行数值分析以及数值实验。
+
+\subsection{Ritz 方法}
+变分法在解决边界值问题中发挥着至关重要的作用，其核心思想在于通过构建一个泛函并寻找其极值来间接找到方程的解。Ritz 法是一种常用的近似解法。根据最小势能原理，如果能够列出所有的几何可能位移，那么使总势能取最小值的那一组位移就是真实位移。
+
+在实际应用中，变分方法经常与 Ritz 方法相结合，首先将原问题巧妙地转化为求解泛函极小值的问题，从而将微分方程求解转化为一个优化问题。接着利用 Ritz 方法，将假设的解代入泛函中，形成一个关于假设解参数的表达式，再通过调整这些参数使泛函达到极值，即最小化。例如求解泊松方程，可构造能量泛函：
+\begin{equation}
+    J[u] = \int_{\Omega} \left( \frac{1}{2} |\nabla u|^2 - f u \right) \, d\Omega
+    \label{eq:energy_functional}
+    \end{equation}
+该泛函的极小值对应原微分方程的解，即求解微分方程等价于寻找使 \( J[u] \) 最小的函数 \( u \)。
+
+选择一组满足边界条件的基函数（如多项式、三角函数或分段多项式），构造近似解：
+\begin{equation}
+    u_h(x) = \sum_{i=1}^n c_i \phi_i(x)
+    \label{eq:approx_solution}
+    \end{equation}
+其中 \( c_i \) 为待定系数。
+
+将近似解代入泛函，得到关于系数的多元函数：
+\begin{equation}
+    J(c_1, c_2, \dots, c_n) = \int_{\Omega} \left( \frac{1}{2} \left| \nabla \sum c_i \phi_i \right|^2 - f \sum c_i \phi_i \right) \, d\Omega
+    \label{eq:functional_coeffs}
+    \end{equation}
+例如，对于泊松方程，泛函变为二次型：
+\begin{equation}
+    J(c) = \frac{1}{2} c^T K c - f^T c
+    \label{eq:quadratic_form}
+    \end{equation}
+其中 \( K \) 为刚度矩阵，\( f \) 为载荷向量。
+
+对 \( J \) 求极值（即对所有 \( c_i \) 求偏导并令为零），得到线性方程组：
+\begin{equation}
+    K c = f
+    \label{eq:linear_system}
+    \end{equation}
+解此方程组即得最优系数，从而确定近似解。
+
+\subsection{深度 Ritz 方法}
+有限元方法(FEM)、虚拟元方法(VEM)都受网格剖分的限  制,只有当网格剖分达到足够精细的程度时,才能满足计算精度的要求,这将不可避免增  加计算的时间和成本。但深度 Ritz 方法和 PINN 不受网格剖分的限制,传统方法中，基函数是预先选定的，深度 Ritz 方法用神经网络作为基函数的表示，即由深度神经网络定义的非线性变换。选择能量泛函作为损失函数，通过优化神经网络参数来最小化泛函，从而代替方程求解。
+
+构建网络是深度 Ritz 的关键环节，其网络的每一层结构是通过将多个块进行叠加来构建的。每个块内部包含两个线性变换、两个激活函数以及一个残差连接，残差连接使网络更容易训练，而且有助于避免梯度消失问题。
+
+在第一个全连接层后，输入 \( X \) 的维数由原定值转化为 \( m \)，这样可以增加网络中的权重，以此来提高网络的准确性。网络中的第一个全连接层对应的函数为：
+\begin{equation}
+    h_0 = W_0 X + b_0
+    \label{eq:fc_layer}
+    \end{equation}
+第 \( i \) 个块的工作流程如下：
+\begin{equation}
+    h_i = h_{i-1} + \sigma(W_{i2} \sigma(W_{i1} h_{i-1} + b_{i1}) + b_{i2})
+    \label{eq:block}
+    \end{equation}
+其中，\( W_{ij} \) 是块的权重，\( \sigma \) 是激活函数。
+
+完整的 \( n \) 层网络可以表示为：
+\begin{equation}
+    u_{\theta}(x) = W_n h_{n-1} + b_n
+    \label{eq:network_output}
+    \end{equation}
+其中 \( \theta \) 表示整个网络中的权重。在得到 \( u_{\theta}(x) \) 后，可以通过以下式子获得：
+\begin{equation}
+    J(\theta) = \int_{\Omega} \left( \frac{1}{2} |\nabla u_{\theta}|^2 - f u_{\theta} \right) \, d\Omega
+    \label{eq:loss_function}
+    \end{equation}
+通过将其最小化得到优化了参数 \( \theta^* \) 的就是所求得目标：
+\begin{equation}
+    \theta^* = \arg\min_{\theta} J(\theta)
+    \label{eq:optimal_theta}
+    \end{equation}
+
+与经典的基于网格的正交规则（如梯形规则和辛普森规则）不同，蒙特卡洛算法不受维数灾难的影响，在高维情况下可以良好平稳地工作。但直接计算泛函中积分是相当困难的，所以用蒙特卡洛算法来对泛函进行离散：
+\begin{equation}
+    J(\theta) \approx \frac{|\Omega|}{N} \sum_{i=1}^N \left( \frac{1}{2} |\nabla u_{\theta}(x_i)|^2 - f(x_i) u_{\theta}(x_i) \right)
+    \label{eq:monte_carlo}
+    \end{equation}
+蒙特卡洛方法的核心思想是通过随机采样来估计这个积分的值。
+
+为了高效处理这种情况，我们选择了随机梯度下降（SGD）方法作为解决方案。其中，\( x_i \) 是均匀分布在 \( \Omega \) 上的独立同分布随机变量。损失函数被用来估计神经网络的输出与真实值之间的差异，并为神经网络中的参数优化提供方向。在神经网络反向传播过程中，选择 Adam 优化器，逐层更新参数，使损失函数逐渐减小，直到收敛。
+
+\section{数值结果}
+考虑两端固定的一维弹性杆问题：
+\begin{equation}
+    \begin{cases}
+        -\nabla^2 u  = -1, & x \in (0, 1) \\
+        u(0) = 0 \\
+        u(1) = 1
+    \end{cases}
+\label{eq:strong_form}
+\end{equation}
+该问题的解析解为
+
+\begin{equation}
+    u(x) = \frac{1}{2} x^2 + \frac{1}{2} x
+    \label{eq:strong_form1}
+\end{equation}
+
+本章构建的神经网络基于一个简单的多层感知机结构，具有一个输入层、一个隐藏层和一个输出层，分别对应 1 维输入和 1 维输出，隐藏层的宽度 \( m \) 为 50。本次用于近似一维微分方程的网络是由一个块（两个全连接层）、一个输入层和一个输出层组成的。
+
+边界条件会导致一些问题，通过在损失函数中加入边界条件的残差项，强制网络解在边界处逼近给定值，作为惩罚项来间接强制网络满足边界条件。本章边界损失通过 500 倍的惩罚系数来增强。
+
+对应于体积分损失，通过蒙特卡洛方法（随机采样点）近似积分：
+\begin{equation}
+    L_{\text{vol}} = \frac{1}{N} \sum_{i=1}^N \left( \frac{1}{2} |\nabla u_{\theta}(x_i)|^2 - f(x_i) u_{\theta}(x_i) \right)
+    \label{eq:volume_loss}
+    \end{equation}
+对应于边界条件损失：
+\begin{equation}
+    L_{\text{bdy}} = \frac{1}{M} \sum_{j=1}^M |u_{\theta}(x_j) - g(x_j)|^2
+    \label{eq:boundary_loss}
+    \end{equation}
+总损失为：
+\begin{equation}
+    L = L_{\text{vol}} + 500 \cdot L_{\text{bdy}}
+    \label{eq:total_loss}
+    \end{equation}
+
+训练策略包括 10000 次迭代的梯度下降，使用 Adam 优化器，初始学习率为 0.001，并通过 StepLR 调度器以每 5000 步减少至原来的 30\% 来优化学习率。
+
+为了更定量地分析误差，考虑解析解，用均方误差来近似误差：
+\begin{equation}
+    \text{误差} = \int_{\Omega} |u_{\text{exact}}(x) - u_{\theta^*}(x)|^2 \, dx
+    \label{eq:error}
+    \end{equation}
+计算误差如下：
+
+\begin{table}[h]
+    \centering
+    \caption{不同块数下的误差}
+    \label{tab:error}
+    \begin{tabular}{cc}
+    \toprule
+    块数 & 误差 \\
+    \midrule
+    1 & 0.0068 \\
+    2 & 0.0077 \\
+    3 & 0.0096 \\
+    \bottomrule
+    \end{tabular}
+    \end{table}
+表显示，当使用更多的块时，深度 Ritz 方法没有给出更准确的近似解。然而，由于方程的复杂性，当块的数量增加到 2 个时，迭代过程中会出现过拟合现象。
+
+\chapter{伽辽金无网格法}
+
+\section{弱形式推导}
+考虑强形式 \eqref{eq:strong_form_system} 对应的势能泛函表达式，系统的总势能 \( \Pi(\boldsymbol{x}) \) 可表示为内部能量与外部能量的差：
+\begin{equation}
+    \Pi(\boldsymbol{x}) = \underbrace{\int_\Omega \frac{1}{2} \boldsymbol{\sigma} : \boldsymbol{\varepsilon} \, d\Omega}_{\text{内部能量}} - \underbrace{\left( \int_{\Gamma^t} \boldsymbol{u} \cdot \boldsymbol{t} \, d\Gamma + \int_\Omega \boldsymbol{u} \cdot \boldsymbol{b} \, d\Omega \right)}_{\text{外部能量}}
+    \label{eq:total_potential_energy}
+\end{equation}
+
+令上式的变分为零，即 \( \delta \Pi(\boldsymbol{x}) = 0 \)，可得对应的伽辽金弱形式：
+\begin{equation}
+    \int_\Omega \delta \boldsymbol{\sigma} : \boldsymbol{\varepsilon} \, d\Omega = \int_{\Gamma^t} \delta \boldsymbol{u} \cdot \boldsymbol{t} \, d\Gamma + \int_\Omega \delta \boldsymbol{u} \cdot \boldsymbol{b} \, d\Omega
+    \label{eq:weak_form_galerkin}
+\end{equation}
+其中，\( \delta u(0) \)是虚位移,\( \delta u(0) = 0 \)，满足\(Dirichlet \)条件。
+
+\section{无网格离散化}
+\subsection{构造无网格形函数}
+再生核近似方法的目标是通过离散点近似连续函数 \( u(x) \)。其连续形式为：
+\begin{equation}
+    u^h(x) = \int_{\Omega} \Phi(x - x') u(x') \, d\Omega'
+    \label{eq:rka_continuous}
+\end{equation}
+离散化为：
+\begin{equation}
+    u^h(x) = \sum_{I=1}^{N} \Phi(x - x_I) u(x_I) \Delta V_I
+    \label{eq:rka_discrete}
+\end{equation}
+为保证多项式再生性，修正为：
+\begin{equation}
+    u^h(x) = \sum_{I=1}^{N} \Psi_I(x) u_I
+    \label{eq:rka_corrected}
+\end{equation}
+其中，形函数定义为：
+\begin{equation}
+    \Psi_I(x) = \boldsymbol{p}^T(x) \boldsymbol{b}(x) \Phi(x - x_I) \Delta V_I
+    \label{eq:shape_function1}
+\end{equation}
+
+\subsection{再生条件}
+要求 \( u^h(x) \) 再生 \( m \) 阶多项式：
+\begin{equation}
+    \sum_{I=1}^{N} \Psi_I(x) p_k(x_I) = p_k(x), \quad k = 0, 1, \dots, m
+    \label{eq:reproducing_condition}
+\end{equation}
+代入 \eqref{eq:shape_function1}：
+\begin{equation}
+    \sum_{I=1}^{N} \boldsymbol{p}^T(x) \boldsymbol{b}(x) \Phi(x - x_I) p_k(x_I) \Delta V_I = p_k(x)
+    \label{eq:reproducing_substituted}
+\end{equation}
+定义矩量矩阵：
+\begin{equation}
+    \boldsymbol{M}(x) = \sum_{I=1}^{N} \Phi(x - x_I) \boldsymbol{p}(x_I) \boldsymbol{p}^T(x_I) \Delta V_I
+    \label{eq:moment_matrix}
+\end{equation}
+则：
+\begin{equation}
+    \boldsymbol{p}^T(x) \boldsymbol{b}(x) \boldsymbol{M}(x) = \boldsymbol{p}^T(x)
+    \label{eq:reproducing_matrix}
+\end{equation}
+解得：
+\begin{equation}
+    \boldsymbol{b}(x) = \boldsymbol{M}^{-1}(x) \boldsymbol{p}(x)
+    \label{eq:correction_coefficient}
+\end{equation}
+
+\subsection{无网格形函数}
+代入 \eqref{eq:shape_function1}：
+\begin{equation}
+    \Psi_I(x) = \boldsymbol{p}^T(x) \boldsymbol{M}^{-1}(x) \boldsymbol{p}(x_I) \Phi(x - x_I) \Delta V_I
+    \label{eq:meshless_shape_function}
+\end{equation}
+此形函数满足 \( m \) 阶多项式再生性。
+
+\subsection{位移和应变离散化}
+使用再生核近似：
+\begin{equation}
+    u^h(x) = \sum_{I=1}^N \Psi_I(x) u_I
+    \label{eq:discrete_u1}
+\end{equation}
+形函数：
+\begin{equation}
+    \Psi_I(x) = \boldsymbol{p}^T(x) \boldsymbol{M}^{-1}(x) \boldsymbol{p}(x_I) \Phi(x - x_I) \Delta V_I
+    \label{eq:shape_function}
+\end{equation}
+其中，\( \boldsymbol{p}(x) = [1, x]^T \)，\( \boldsymbol{M}(x) = \sum_{I=1}^N \Phi(x - x_I) \boldsymbol{p}(x_I) \boldsymbol{p}^T(x_I) \Delta V_I \)。
+
+应变为：
+\begin{equation}
+    \varepsilon(x) = \frac{du^h}{dx} = \sum_{I=1}^N B_I(x) u_I, \quad B_I(x) = \frac{d \Psi_I(x)}{dx}
+    \label{eq:discrete_strain}
+\end{equation}
+虚位移和虚应变：
+\begin{equation}
+    \delta u^h(x) = \sum_{I=1}^N \Psi_I(x) \delta u_I, \quad \delta \varepsilon(x) = \sum_{I=1}^N B_I(x) \delta u_I
+    \label{eq:virtual_displacement}
+\end{equation}
+
+\section{离散弱形式}
+
+将 \eqref{eq:discrete_u1} 和 \eqref{eq:virtual_displacement} 代入 \eqref{eq:weak_form_galerkin}：
+\[
+    \int_0^l EA \left( \sum_{I=1}^N B_I(x) u_I \right) \left( \sum_{J=1}^N B_J(x) \delta u_J \right) \, dx = \int_0^l \left( \sum_{J=1}^N \Psi_J(x) \delta u_J \right) q \, dx + \left( \sum_{J=1}^N \Psi_J(l) \delta u_J \right) F
+    \label{eq:weak_form_discrete}
+\]
+提取 \( \delta u_J \)：
+\begin{equation}
+    \sum_{I=1}^N \left( \int_0^l EA B_I(x) B_J(x) \, dx \right) u_I = \int_0^l \Psi_J(x) q \, dx + \Psi_J(l) F
+    \label{eq:discrete_equation}
+\end{equation}
+
+\noindent
+刚度矩阵定义为
+\begin{equation}
+    K_{IJ} = \int_0^l EA B_I(x) B_J(x) \, dx
+    \label{eq:stiffness_matrix}
+\end{equation}
+力向量定义为
+\begin{equation}
+    f_J = \int_0^l \Psi_J(x) q \, dx + \Psi_J(l) F
+    \label{eq:force_vector}
+\end{equation}
+伽辽金无网格离散方程为：
+\begin{equation}
+    \boldsymbol{K} \boldsymbol{u} = \boldsymbol{f}
+    \label{eq:galerkin_meshless}
+\end{equation}
+
+
+
+\section{拉格朗日乘子法}
+
+由于无网格形函数通常不具有插值特性,因此需要采用适当的方法施加强制边界条件，拉格朗日乘子法是一种在数值方法中施加约束条件的强大工具，广泛应用于有限元法、无网格法等场景。其核心在于通过构造增广泛函，将原始问题的能量泛函与约束条件结合，确保解同时满足物理方程和附加约束。
+
+\subsection{对原始能量泛函添加约束条件}
+
+考虑一般的偏微分方程问题，其弱形式可表示为：
+\begin{equation}
+a(u, v) = l(v),
+\label{eq:weak_form_general}
+\end{equation}
+其中 \( a(u, v) \) 是双线性形式，\( l(v) \) 是线性形式，\( u \) 是解函数，\( v \) 是试函数。例如，在弹性力学或热传导问题中，\( a(u, v) \) 可能涉及梯度项积分，\( l(v) \) 则对应外力或源项的积分。
+
+假设问题需满足一组线性约束条件，例如 Dirichlet 条件或其他物理约束，形式为：
+\begin{equation}
+c_k(u) = q_k, \quad k = 1, 2, \ldots, m,
+\label{eq:general_constraints}
+\end{equation}
+其中 \( m \) 是约束数量，\( c_k(u) \) 是线性泛函，\( q_k \) 是给定值。原始能量泛函 \( J(u) \) 定义为：
+\begin{equation}
+J(u) = \frac{1}{2} a(u, u) - l(u).
+\label{eq:energy_functional_general}
+\end{equation}
+为施加约束，引入拉格朗日乘子 \( \lambda = [\lambda_1, \lambda_2, \ldots, \lambda_m]^T \)，构造增广泛函：
+\begin{equation}
+L(u, \lambda) = J(u) + \sum_{k=1}^m \lambda_k [c_k(u) - q_k].
+\label{eq:lagrangian_general}
+\end{equation}
+对 \( L(u, \lambda) \) 取变分，分别对 \( u \) 和 \( \lambda \) 求偏导并置零：
+\begin{equation}
+\delta L = a(\delta u, u) - l(\delta u) + \sum_{k=1}^m \lambda_k c_k(\delta u) = 0,
+\label{eq:variation_u_general}
+\end{equation}
+\begin{equation}
+\delta L = \sum_{k=1}^m \delta \lambda_k [c_k(u) - q_k] = 0.
+\label{eq:variation_lambda_general}
+\end{equation}
+从而得到增广弱形式：
+\begin{equation}
+a(v, u) + \sum_{k=1}^m \lambda_k c_k(v) = l(v),
+\label{eq:augmented_weak_form_general}
+\end{equation}
+以及约束条件：
+\begin{equation}
+c_k(u) = q_k, \quad k = 1, 2, \ldots, m.
+\label{eq:constraints_general}
+\end{equation}
+此形式适用于任意线性约束，不限于特定物理问题或边界条件。
+
+\subsection{离散化}
+
+在数值方法中，解 \( u \) 和试函数 \( v \) 通过形函数离散表示为：
+\begin{equation}
+u^h(x) = \sum_{I=1}^{NP} \Psi_I(x) d_I, \quad v^h(x) = \sum_{I=1}^{NP} \Psi_I(x) v_I,
+\label{eq:discrete_u_general}
+\end{equation}
+其中 \( NP \) 是节点总数，\( \Psi_I(x) \) 是形函数，\( d_I \) 和 \( v_I \) 分别是节点系数。代入增广弱形式 \eqref{eq:augmented_weak_form_general}，得到：
+\begin{equation}
+\sum_{I=1}^{NP} v_I \left[ \sum_{J=1}^{NP} a(\Psi_I, \Psi_J) d_J + \sum_{k=1}^m \lambda_k c_k(\Psi_I) - l(\Psi_I) \right] = 0.
+\label{eq:discrete_augmented_weak_form}
+\end{equation}
+由于 \( v_I \) 任意，方括号内每一项为零。约束条件离散为：
+\begin{equation}
+\sum_{J=1}^{NP} c_k(\Psi_J) d_J = q_k, \quad k = 1, 2, \ldots, m.
+\label{eq:discrete_constraints_general}
+\end{equation}
+
+引入以下矩阵和向量，刚度矩阵 {K}、载荷向量 {f}、约束矩阵 {G}、拉格朗日乘子向量 {λ} 和约束向量 {q}：
+\begin{equation}
+\begin{aligned}
+\boldsymbol{K} &: K_{IJ} = a(\Psi_I, \Psi_J), \\
+\boldsymbol{f} &: f_I = l(\Psi_I), \\
+\boldsymbol{G} &= \begin{bmatrix} 
+c_1(\Psi_1) & c_1(\Psi_2) & \cdots & c_1(\Psi_{NP}) \\ 
+c_2(\Psi_1) & c_2(\Psi_2) & \cdots & c_2(\Psi_{NP}) \\ 
+\vdots & \vdots & \ddots & \vdots \\ 
+c_m(\Psi_1) & c_m(\Psi_2) & \cdots & c_m(\Psi_{NP})
+\end{bmatrix}^T, \\
+\boldsymbol{\lambda} &= [\lambda_1, \lambda_2, \ldots, \lambda_m]^T, \\
+\boldsymbol{q} &= [q_1, q_2, \ldots, q_m]^T.
+\end{aligned}
+\label{eq:compact_definitions_matrices}
+\end{equation}
+
+增广系统为：
+\begin{equation}
+\begin{bmatrix}
+\boldsymbol{K} & \boldsymbol{G} \\
+\boldsymbol{G}^T & 0
+\end{bmatrix}
+\begin{bmatrix}
+\boldsymbol{d} \\
+\boldsymbol{\lambda}
+\end{bmatrix}
+=
+\begin{bmatrix}
+\boldsymbol{f} \\
+\boldsymbol{q}
+\end{bmatrix}.
+\label{eq:augmented_system_general}
+\end{equation}
+
+\begin{comment}
+\section{高斯积分法}
+由于 EFG 不使用传统网格，积分需要通过数值方法计算，通常采用高斯积分。
+在定义域 \([0, 1]\) 上，采用背景网格将区间划分为多个单元，如 \( [x_i, x_{i+1}] \)。对于每个单元，使用高斯积分近似积分：
+\begin{equation}
+    \int_{x_i}^{x_{i+1}} f(x) \, dx \approx \sum_{k=1}^{n_g} w_k f(\xi_k)
+    \label{eq:gauss_quadrature}
+\end{equation}
+其中：
+ \( n_g \)：高斯积分点数；
+ \( w_k \)：高斯权重；
+ \( \xi_k \)：高斯积分点（位于标准区间 \([-1, 1]\) 上）；
+ \( x = \frac{x_{i+1} + x_i}{2} + \frac{x_{i+1} - x_i}{2} \xi_k \)：将标准积分点映射到子区间。
+
+对于子区间 \([x_i, x_{i+1}]\)，长度为 \( h = x_{i+1} - x_i \)，映射后的积分为：
+\begin{equation}
+    \int_{x_i}^{x_{i+1}} f(x) \, dx = \frac{h}{2} \sum_{k=1}^{3} w_k f\left( \frac{x_{i+1} + x_i}{2} + \frac{x_{i+1} - x_i}{2} \xi_k \right)
+    \label{eq:gauss_mapping}
+\end{equation}
+\end{comment}
+\section{高斯积分法}
+数值实现中，\( \boldsymbol{K} \) 和 \( \boldsymbol{f} \) 的元素通常涉及积分，例如 \( K_{IJ} = \int_{\Omega} \nabla \Psi_I \cdot \nabla \Psi_J \, dx \) 或 \( f_I = \int_{\Omega} f \Psi_I \, dx \)。这些积分无法解析求解，需采用高斯积分法近似。对于一维问题，积分区间划分为单元 \( [x_e, x_{e+1}] \)，高斯积分公式为：
+\begin{equation}
+\int_{x_e}^{x_{e+1}} g(x) \, dx \approx \sum_{i=1}^{n_g} w_i g(x_i) \frac{h_e}{2},
+\label{eq:gauss_quadrature}
+\end{equation}
+其中 \( h_e = x_{e+1} - x_e \) 是单元长度，\( x_i = \frac{x_{e+1} + x_e}{2} + \frac{h_e}{2} \xi_i \)，\( \xi_i \) 和 \( w_i \) 分别是高斯积分点和权重，\( n_g \) 是积分点数。高斯积分的高效性在于，\( n_g \) 点公式可精确计算最高 \( 2n_g - 1 \) 阶多项式的积分，适用于形函数的低阶性质。
+
+通过在每个单元内应用高斯积分，计算局部贡献并组装到全局矩阵 \( \boldsymbol{K} \) 和向量 \( \boldsymbol{f} \)，最终求解增广系统 \eqref{eq:augmented_system_general}，得到节点解 \( \boldsymbol{d} \) 和拉格朗日乘子 \( \boldsymbol{\lambda} \)。
+
+
+\newpage
+\section{数值结果}
+考虑\eqref{eq:strong_form}两端固定的一维弹性杆问题，即
+\[
+    \left\{
+    \begin{array}{ll}
+        \nabla^2 u - q = 0 & \mathrm{in~} (0, l) \\
+        u(0) =u(1)= 0 
+    \end{array}
+    \right.
+    \label{eq:strong_form1}
+\]
+
+
+该问题的解析解为：
+\begin{equation}
+u(x) = \frac{x^2}{2} + \frac{x}{2}
+\label{eq:analytical_solution}
+\end{equation}
+
+采用再生核近似方法（RKPM）进行离散，具体参数如下：
+线性基函数取 \( \boldsymbol{p}(x) = [1, x]^T \)，确保形函数再生 1 阶多项式。节点数为 \( NP = 5 \)，节点均匀分布于 \( [0, 1] \)，即 \( x_I = \{0.0, 0.25, 0.50, 0.75, 1.0\} \)。形函数影响域为 \( s = 0.5 \)，为节点间距 \( 0.25 \) 的 2 倍，保证足够覆盖。核函数采用三次样条核函数：
+\begin{equation}
+    \Phi(r) = 
+    \begin{cases} 
+    \frac{2}{3} - 4r^2 + 4r^3 & r \leq 0.5 \\
+    \frac{4}{3} - 4r + 4r^2 - \frac{4}{3}r^3 & 0.5 < r \leq 1.0 \\
+    0 & r > 1.0 
+    \end{cases}
+    \label{eq:cubic_spline}
+\end{equation}
+其中，\( r = \frac{|x - x_I|}{s} \)。
+\begin{comment}
+形函数及其导数为：
+\begin{equation}
+    \Psi_I(x) = \boldsymbol{p}^T(0) \boldsymbol{M}^{-1}(x) \boldsymbol{p}(x_I - x) \Phi(x - x_I)
+    \label{eq:shape_function}
+\end{equation}
+\begin{equation}
+    B_I(x) = \frac{d \Psi_I(x)}{dx}
+    \label{eq:shape_derivative}
+\end{equation}
+矩量矩阵：
+\begin{equation}
+    \boldsymbol{M}(x) = \sum_{I=1}^{NP} \Phi(x - x_I) \boldsymbol{p}(x_I - x) \boldsymbol{p}^T(x_I - x)
+    \label{eq:moment_matrix}
+\end{equation}
+
+\subsection{弱形式与离散}
+弱形式为：
+\begin{equation}
+    \int_0^1 EA \frac{d u}{dx} \frac{d (\delta u)}{dx} \, dx = \int_0^1 \delta u q \, dx + \delta u(1) F
+    \label{eq:weak_form}
+\end{equation}
+设 \( EA = 1 \)，则：
+\begin{equation}
+    \int_0^1 \frac{d u}{dx} \frac{d (\delta u)}{dx} \, dx = -\int_0^1 \delta u \, dx + \delta u(1) \cdot \frac{3}{2}
+    \label{eq:weak_form_simplified}
+\end{equation}
+
+离散位移：
+\begin{equation}
+    u^h(x) = \sum_{I=1}^{NP} \Psi_I(x) u_I, \quad \delta u^h(x) = \sum_{I=1}^{NP} \Psi_I(x) \delta u_I
+    \label{eq:discrete_u}
+\end{equation}
+应变：
+\begin{equation}
+    \varepsilon = \frac{du^h}{dx} = \sum_{I=1}^{NP} B_I(x) u_I
+    \label{eq:discrete_strain}
+\end{equation}
+代入弱形式：
+\begin{equation}
+    \sum_{I=1}^{NP} \delta u_I \left[ \sum_{J=1}^{NP} \left( \int_0^1 B_I(x) B_J(x) \, dx \right) u_J + \int_0^1 \Psi_I(x) \, dx - \Psi_I(1) \cdot \frac{3}{2} \right] = 0
+    \label{eq:discrete_equation}
+\end{equation}
+刚度矩阵和力向量：
+\begin{equation}
+    K_{IJ} = \int_0^1 B_I(x) B_J(x) \, dx, \quad f_I = -\int_0^1 \Psi_I(x) \, dx + \Psi_I(1) \cdot \frac{3}{2}
+    \label{eq:kf_elements}
+\end{equation}
+\end{comment}
+
+离散方程为：
+\begin{equation}
+    \boldsymbol{K} \boldsymbol{u} = \boldsymbol{f}
+    \label{eq:galerkin_meshless}
+\end{equation}
+由于 \( u(0) = 0 \) 是 Dirichlet 条件，需通过拉格朗日乘子法施加，增广系统为：
+\begin{equation}
+    \begin{bmatrix}
+        \boldsymbol{K} & \boldsymbol{G} \\
+        \boldsymbol{G}^T & 0
+    \end{bmatrix}
+    \begin{bmatrix}
+        \boldsymbol{u} \\
+        \lambda
+    \end{bmatrix}
+    =
+    \begin{bmatrix}
+        \boldsymbol{f} \\
+        0
+    \end{bmatrix}
+    \label{eq:augmented_system}
+\end{equation}
+其中，\( G_{I1} = \Psi_I(0) \)。
+
+在代码中，采用 \( n_g = 3 \) 的 3 点高斯积分：
+\begin{itemize}
+    \item 积分点：\( \xi_k = \left\{ -\sqrt{\frac{3}{5}}, 0, \sqrt{\frac{3}{5}} \right\} \)，即约 \( \{-0.7746, 0, 0.7746\} \)；
+    \item 权重：\( w_k = \left\{ \frac{5}{9}, \frac{8}{9}, \frac{5}{9} \right\} \)，即约 \( \{0.5556, 0.8889, 0.5556\} \)。
+\end{itemize}
+
+
+\chapter{图表设置}
+\subsection*{单张}
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.4]{figures/1.png}
+    \caption{\centering{边界点处无网格形函数}}
+    \label{CHGraphsettings_fig1_meshfree}
+\end{figure}
+单张图片Latex代码
+\begin{lstlisting}
+\begin{figure}[H]-放置位置
+\centering-居中
+\includegraphics[scale=0.4]{figures/1.png}-大小、图片路径
+\caption{\centering{边界点处无网格形函数}}-图名
+\label{CHGraphsettings_fig1_meshfree}-命名
+\end{figure}
+\end{lstlisting}
+\newpage
+\subsection*{并排}
+\begin{figure}[H]
+    \centering
+    \begin{subcaptiongroup}
+    \includegraphics[width=0.49\textwidth]{figures/1.png}
+    \phantomcaption\label{1}
+    \includegraphics[width=0.49\textwidth]{figures/2.png}
+    \phantomcaption\label{2}
+    \end{subcaptiongroup}
+\caption{\centering{无网格形函数：\subref{1}边界点；\subref{2}中心点}}
+% NOTE:遇到图名过长需要换行的编写：
+% \caption{\centering{标题：\protect\linebreak \subref{xxx} 小标题1；\subref{xx} 小标题2；\subref{xxx}小标题3；\subref{xxx} 小标题4}}
+\label{CHGraphsettings_fig2_meshfree}
+\end{figure}
+并排图片Latex代码
+\begin{lstlisting}
+\begin{figure}[H]
+\centering
+\begin{subcaptiongroup}
+\includegraphics[width=0.49\textwidth]{figure/1.png}
+\phantomcaption\label{1}
+\includegraphics[width=0.49\textwidth]{figure/2.png}
+\phantomcaption\label{2}
+\end{subcaptiongroup}
+\caption{\centering{无网格形函数：\subref{1}边界点；\subref{2}中心点}}
+\end{lstlisting}
+\newpage
+\subsection*{表格式图片}
+\begin{figure}[H]
+    \centering
+    \begin{tabular}{cccc}
+    $\quad$&$p=2$&$p=2$&$p=2$\\
+    边界点&\begin{subcaptiongroup}\raisebox{-0.5\height}{\includegraphics[width=0.3\textwidth]{figures/1.png}}\end{subcaptiongroup}
+    &\begin{subcaptiongroup}\raisebox{-0.5\height}{\includegraphics[width=0.3\textwidth]{figures/1.png}}\end{subcaptiongroup}
+    &\begin{subcaptiongroup}\raisebox{-0.5\height}{\includegraphics[width=0.3\textwidth]{figures/1.png}}\end{subcaptiongroup}\\
+    中心点&\begin{subcaptiongroup}\raisebox{-0.5\height}{\includegraphics[width=0.3\textwidth]{figures/2.png}}\end{subcaptiongroup}
+    &\begin{subcaptiongroup}\raisebox{-0.5\height}{\includegraphics[width=0.3\textwidth]{figures/2.png}}\end{subcaptiongroup}
+    &\begin{subcaptiongroup}\raisebox{-0.5\height}{\includegraphics[width=0.3\textwidth]{figures/2.png}}\end{subcaptiongroup}\\
+    \end{tabular}
+    \caption{\textbf{二维边界点与内部节点无网格形函数图}}\label{CHGraphsettings_fig3_meshfree}
+    \end{figure}
+
+表格式图片Latex代码
+\begin{lstlisting}
+\begin{figure}[H]
+\centering
+\begin{tabular}{cccc}
+$\quad$&$p=2$&$p=2$&$p=2$\\
+边界点&\begin{subcaptiongroup}\raisebox{-0.5\height}{\includegraphics[width=0.3\textwidth]{figure/1.png}}\end{subcaptiongroup}
+&\begin{subcaptiongroup}\raisebox{-0.5\height}{\includegraphics[width=0.3\textwidth]{figure/1.png}}\end{subcaptiongroup}
+&\begin{subcaptiongroup}\raisebox{-0.5\height}{\includegraphics[width=0.3\textwidth]{figure/1.png}}\end{subcaptiongroup}\\
+中心点&\begin{subcaptiongroup}\raisebox{-0.5\height}{\includegraphics[width=0.3\textwidth]{figure/2.png}}\end{subcaptiongroup}
+&\begin{subcaptiongroup}\raisebox{-0.5\height}{\includegraphics[width=0.3\textwidth]{figure/2.png}}\end{subcaptiongroup}
+&\begin{subcaptiongroup}\raisebox{-0.5\height}{\includegraphics[width=0.3\textwidth]{figure/2.png}}\end{subcaptiongroup}\\
+\end{tabular}
+\caption{\textbf{二维边界点与内部节点无网格形函数图}}\label{CHGraphsettings_fig3_meshfree}
+\end{figure}     
+\end{lstlisting}
+
+\subsection*{三线表}
+\begin{table}[H]
+    \caption{\textbf{三次基函数无网格法分片实验结果}}
+    \centering\label{CHGraphsettings_table_cubic}
+    \begin{tabular}{lcccc}
+       \toprule
+    & \multicolumn{2}{c}{二次分片实验} & \multicolumn{2}{c}{三次分片实验} \\ \cline{2-5}
+       &$L_2$-Error$\quad$&$H_1$-Error&$L_2$-Error$\quad$&$H_1$-Error\\
+       \midrule
+      RKGSI-Penalty&$1.4\times10^{-7}$&$2.1\times10^{-6}$&$2.0\times10^{-7}$&$2.7\times10^{-6}$\\
+      RKGSI-LM&$3.0\times10^{-4}$&$9.8\times10^{-3}$&$4.2\times10^{-4}$&$9.8\times10^{-3}$\\
+      RKGSI-Nitsche&$3.6\times10^{-15}$&$1.0\times10^{-13}$&$4.6\times10^{-15}$&$9.5\times10^{-14}$\\
+      RKGSI-HR&$3.1\times10^{-15}$&$1.0\times10^{-13}$&$3.5\times10^{-15}$&$7.4\times10^{-14}$\\
+       \bottomrule
+    \end{tabular}
+    \end{table}
+三线表Latex代码
+\begin{lstlisting}
+\begin{table}[H]
+\caption{\textbf{三次基函数无网格法分片实验结果}}
+\centering\label{CHGraphsettings_table_cubic}
+\begin{tabular}{lcccc}
+\toprule
+& \multicolumn{2}{c}{二次分片实验} & \multicolumn{2}{c}{三次分片实验} \\ \cline{2-5}
+&$L_2$-Error$\quad$&$H_1$-Error&$L_2$-Error$\quad$&$H_1$-Error\\
+\midrule
+RKGSI-Penalty&$1.4\times10^{-7}$&$2.1\times10^{-6}$&$2.0\times10^{-7}$&$2.7\times10^{-6}$\\
+RKGSI-LM&$3.0\times10^{-4}$&$9.8\times10^{-3}$&$4.2\times10^{-4}$&$9.8\times10^{-3}$\\
+RKGSI-Nitsche&$3.6\times10^{-15}$&$1.0\times10^{-13}$&$4.6\times10^{-15}$&$9.5\times10^{-14}$\\
+RKGSI-HR&$3.1\times10^{-15}$&$1.0\times10^{-13}$&$3.5\times10^{-15}$&$7.4\times10^{-14}$\\
+\bottomrule
+\end{tabular}
+\end{table}    
+\end{lstlisting}
+
+\chapter{使用Zotero管理参考文献}
+1.下载附件：Better BibTex
+链接：\href{https://zhuanlan.zhihu.com/p/621145900}{Better BibTex安装步骤}
+
+2.新建分类建立文件库：references
+
+3.右击该文件库-选择导出分类-以Better BibTex形式导出条目
+
+4.导出条目至与Latex文件相同路径
+
+5.在主文件(ef:main.tex)中添加：
+\begin{lstlisting}
+\begin{document}
+    .....
+    \bibliography{references}--导出文献的文件名
+    .....
+\end{document}
+\end{lstlisting}
+eg：基于赫林格-赖斯纳原理的变分一致型伽辽金无网格法\cite{Wu2022,wu2023}相较于传统的本质边界条件施加方法能够有效提高计算精度和计算效率。
+
+Latex代码
+
+\begin{lstlisting}
+eg：基于赫林格-赖斯纳原理的变分一致型伽辽金无网格法\cite{Wu2022,wu2023}相较于传统的本质边界条件施加方法能够有效提高计算精度和计算效率。
+\end{lstlisting}
+
+\chapter{\LaTeX 部分所需包介绍}
+
+
+编写公式-\{amsmath,amsfonts,amssymb,textcomp,ulem\}
+
+绘制表格-\{booktabs,multirow,tabularx,float\}
+
+书写代码-\{listings\}
+
+代码块设置
+\begin{lstlisting}
+\lstset{breaklines,        %自动换行
+        columns=flexible,  %不随便添加空格,只在已经有空格的地方添加空格,
+       }
+\end{lstlisting}
+
+设置PDF文档中超链接的颜色
+\begin{lstlisting}
+\hypersetup{colorlinks=true,linkcolor=black,citecolor=black}
+\end{lstlisting}
+
+
+
+% NOTE 毕业论文致谢部分
+% \include{acknowledgments}
+\appendix
+\chapter{附录}
+附录章节前需添加以下下代码
+\begin{lstlisting}
+    \appendix
+\end{lstlisting}
+
+
+\chapter{参考格式}
+\begin{lstlisting}
+
+\documentclass[engineeringmaster]{hquThesis}-hquThesis是模板文件,包含文本格式,字体设置,文献格式.....
+\usepackage{amsmath,amsfonts,amssymb,textcomp}-公式所需
+\usepackage{booktabs,multirow,tabularx,float}-表格所需
+\hypersetup{colorlinks=true,linkcolor=black,citecolor=black}-设置超链接格式
+\titleZh{XXX}-中文标题
+\titleEn{XXX}-英文标题
+\id{}-学号
+\authorZh{XXX}-作者姓名
+\supervisorZh{XXX}{XXX}-指导教师+职称
+\cosupervisorZh{XXX}{XXX}-合作教师+职称
+\practicevisorZh{XXX}{XXX}-实践教师+职称
+\departmentZh{土木工程学院}
+\fieldZh{结构体系创新与工程应用}
+\majortype{工程硕士}
+\major{土木水利}
+\coverdate{二〇二四年三月XX日}
+-封面设置
+\begin{document}-正文开始
+
+\makecover
+\include{decision}-答辩委员会
+\include{declaration}-独创性说明
+\frontmatter
+\include{abstract}-摘要
+\tableofcontents
+\mainmatter
+\include{Introduction}-正文章节
+\include{XXX}
+\include{XXXX}
+\backmatter-页眉另起设置
+\bibliography{references}-引用参考文献条目(.bib)
+\include{acknowledgments}-致谢
+\appendix-附录部分
+\include{appendixA}-附录章节
+\include{appendixB}-附录章节
+\include{cv}-个人简历
+
+\end{document}-结束正文
+\end{lstlisting}
+
+
+\backmatter
+
+
+\bibliography{references}
+
+% NOTE 毕业论文个人简历部分
+\include{cv}
+
+\end{document}
