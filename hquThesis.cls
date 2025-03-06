@@ -82,7 +82,7 @@
     \noindent\parbox{\textwidth}{\ttfamily\setstretch{1.5}\fontsize{10.5pt}{\baselineskip}\selectfont
         学校代码：\hspace{6pt}\underline{\textrm{10385}}\hfill 分类号：\underline{\hspace{72pt}}
 
-        研究生学号：\underline{\makebox[72pt]{\textrm{\ifdefined\@id \@id \fi}}}\hfill 密\hspace{10.5pt}集：\underline{\hspace{72pt}}
+        本科生学号：\underline{\makebox[72pt]{\textrm{\ifdefined\@id \@id \fi}}}\hfill 密\hspace{10.5pt}集：\underline{\hspace{72pt}}
     }
 
     \begin{figure}[h!]
@@ -93,7 +93,7 @@
         \ifdefined\@titleZh
             \@titleZh
         \else
-            华侨大学\degree 研究生论文 \LaTeX 模版
+            华侨大学\degree 本科生论文 \LaTeX 模版
         \fi
         
         \ifdefined\@titleEn
@@ -117,7 +117,7 @@
         \makebox[\titlelength][s]{作者姓名}： \underline{\makebox[182pt][c]{\makebox[42pt][s]{\textrm{\textbf{\ifdefined\@authorZh
             \@authorZh
         \else
-            张三
+            陈一锋
         \fi}}}}}
 
         \makebox[\titlelength][s]{指导教师}： \underline{\makebox[182pt][c]{\makebox[\infolength]{\makebox[42pt][s]{\textrm{\textbf{\ifdefined\@supervisorZh
