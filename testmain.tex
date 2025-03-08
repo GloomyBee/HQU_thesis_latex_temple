@@ -25,14 +25,27 @@
 \mainmatter
 \chapter{绪论}
 \section{研究背景和意义}
+无网格法通过节点信息直接构造形函数，不依赖节点间的有序单元连接，能够生成任意高阶连续的整体协调形函数。与传统有限元法相比，无网格法在求解大变形问题、移动边界问题和高阶问题时具有显著优势，尤其适用于土木工程中的复杂数值计算。伽辽金型无网格法是目前应用最广泛的无网格法分支之一，其基于弱形式的数值离散在理论上兼具高精度和高灵活性。然而，伽辽金型无网格法的形函数通常不具备多项式特性，且具有非插值性，影响域与背景积分网格往往不重合，导致数值积分需依赖高阶高斯积分。这使得计算效率低下，难以高效处理土木工程中的大型实际问题。因此，如何提升伽辽金型无网格法的计算效率成为算法研究领域的核心挑战之一。
+
+近年来，深度学习技术的兴起为数值解算提供了新视角。深度利兹法（Deep Ritz Method）通过神经网络直接优化变分问题的能量泛函，无需显式网格划分，在复杂边界条件和高维问题的求解中展现出独特优势。然而，传统深度利兹法在高阶问题中的收敛性不足、对网络训练参数敏感，导致其在土木工程复杂场景下的解算精度和稳定性有待优化。再生核近似作为伽辽金型无网格法的重要理论基础，以其高精度逼近和插值能力，为增强深度学习模型提供了潜力。如何将再生核近似的高阶特性与深度利兹法的优化能力相结合，成为提升数值解算性能的关键问题。
+
+本文提出基于再生核近似的增强深度利兹法，旨在优化传统深度学习模型在土木工程问题中的数值解算效果。通过将再生核近似融入深度利兹法的神经网络框架，本研究不仅探索其理论可行性，还分析其在精度、效率和稳定性方面的改进效果。研究总结了伽辽金型无网格法中再生核近似的基本原理，结合深度利兹法的变分求解特点，探讨两者融合在土木工程数值计算中的应用前景。本方法的提出旨在为复杂工程问题的解算提供高效、稳定的算法支持，推动数值计算领域的理论与实践发展。
 \section{国内外研究现状}
+伽辽金型无网格法是无网格方法的重要分支，以高阶光滑性和复杂问题适应性著称。Belytschko等人于1994年提出伽辽金无单元法（Element Free Galerkin Method, EFG），基于移动最小二乘近似（MLS）构造形函数，通过背景网格和高阶积分提升精度（Belytschko, 1994）。此后，Liu等人于1995年提出再生核近似（Reproducing Kernel Approximation, RK），通过多项式再生条件和校正函数改进逼近能力，发展出再生核质点法（RKPM），显著增强了数值稳定性（Liu, 1995）。再生核理论在数值逼近、插值和数据拟合中具有显著优势，通过将其与深度利兹法相结合，可实现对复杂土木工程问题的高精度、稳定的解算。深度利兹法（Deep Ritz Method）由E W和Yu B于2017年提出，利用深度神经网络最小化变分问题的能量泛函，为偏微分方程求解提供了新途径（E W, 2017）。该方法无需网格划分，在处理复杂边界条件和高维问题时表现出灵活性。通过将再生核理论与深度利兹法相结合，可实现对复杂土木工程问题的高精度、稳定的解算。论文旨在探讨再生核近似的理论基础及其在增强深度利兹法中的应用效果，为土木工程中的数值计算和模型预测提供创新性方法。
 \section{本文研究内容和组织结构}
+本文旨在研究并实现一种基于再生核近似的增强深度利兹法，优化传统深度学习模型在土木工程问题中的数值解算效果，重点针对一维拉压杆等弹性力学问题的微分方程求解，探索其在复杂工程场景中的应用潜力。研究内容涵盖理论分析、方法介绍及算法创新，围绕一维拉压杆问题展开系统研究，同时为更广泛的土木工程数值计算提供支持。
 
+首先，本文从一维拉压杆问题的微分方程求解入手，基于弹性力学原理分析其控制微分方程及其边界条件。通过建立明确的数学模型，为后续数值方法的验证提供基础算例。这一阶段着重梳理拉压杆问题的力学背景，为算法研究奠定理论基础。
+
+接着，本文介绍深度利兹法的理论与应用，阐释其通过神经网络最小化能量泛函的变分求解原理，分析其在土木工程数值解算中的适用性。以一维拉压杆问题为例，设计数值算例，验证传统深度利兹法的解算精度与效率，同时识别其在高阶问题中的局限性，为后续改进提供依据。
+
+随后，本文转向伽辽金型无网格法的理论与实践，阐述其基于节点构造高阶形函数的基本原理，重点分析数值积分的实现方式。以一维拉压杆问题为算例，验证伽辽金无网格法（如再生核质点法）的逼近能力和稳定性，探讨其计算复杂度与边界处理问题，为增强方法的开发提供参考。
+
+最后，本文提出并研究基于再生核近似的增强深度利兹法。在理论基础研究中，分析再生核近似的高精度逼近特性与深度利兹法的变分求解原理，推导两者结合的数学框架，探索增强深度利兹法的理论可行性。在算法设计与实现中，设计增强算法模型，将再生核形函数融入神经网络结构，改进损失函数，利用Python编程实现算法框架，并对比其与传统深度利兹法和伽辽金无网格法的性能。在数值验证与分析中，以一维拉压杆问题及其扩展的土木工程典型问题（如结构力学偏微分方程求解）为对象，验证增强方法的精度、效率和稳定性，分析其相较于传统方法的改进效果。
+
+\clearpage
 \chapter{一维拉压杆模型的计算方法}
-
-\section{一维拉压杆模型}
-
-\subsection{平衡微分方程}
+\section{平衡微分方程}
 考虑一均匀等截面杆，长度为 \( l \)，横截面积为 \( A \)，弹性模量为 \( E \)。杆的左端固定（位移为零），右端施加拉力 \( F \)，杆整体施加单位长度的体力 \( q \)（假设为常数）。取一微元体，考虑微元的受力平衡：左侧轴力 \( N(x) \)，方向为 \( x \) 轴负方向；右侧轴力 \( N(x + dx) \)，方向为 \( x \) 轴正方向。由 \( x \) 方向的平衡方程有：
 \begin{equation}
     N(x + dx) - N(x) + q \, dx = 0
@@ -59,7 +72,7 @@
     \label{eq:equilibrium4}
 \end{equation}
 
-\subsection{边界条件}
+\section{边界条件}
 左端固定：
 \begin{equation}
     u(0) = 0
@@ -83,7 +96,7 @@
 \end{equation}
 
 \newpage
-\subsection{解析解的推导}
+\section{解析解的推导}
 对 \eqref{eq:equilibrium4} 进行积分：
 \begin{enumerate}
     \item 第一次积分：
@@ -124,7 +137,7 @@
 
 
 \newpage
-\chapter{深度学习计算方法}
+\chapter{深度Ritz计算方法}
 本章运用深度 Ritz 方法对一维线弹性夹紧板模型进行数值计算，深度 Ritz 方法其核心思想是将变分问题转化为优化问题。给出一维线弹性夹紧板模型，对其进行 Ritz 变分，将每一个变分问题都等价的转化为最小化问题，并进行数值分析以及数值实验。
 
 \section{Ritz 方法}
@@ -251,21 +264,65 @@
     \end{equation}
 计算误差如下：
 
-\begin{table}[h]
+\begin{figure}[htbp]
     \centering
-    \caption{不同块数下的误差}
-    \label{tab:error}
-    \begin{tabular}{cc}
-    \toprule
-    块数 & 误差 \\
-    \midrule
-    1 & 0.0068 \\
-    2 & 0.0077 \\
-    3 & 0.0096 \\
-    \bottomrule
+    \begin{subfigure}[b]{0.8\textwidth}
+        \centering
+        \includegraphics[width=\textwidth, height=6cm, keepaspectratio]{figures/4.png}
+        \caption{预测解与精确解对比}
+        \label{fig:predicted_vs_exact}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.8\textwidth}
+        \centering
+        \includegraphics[width=\textwidth, height=6cm, keepaspectratio]{figures/5.png}
+        \caption{绝对误差分布}
+        \label{fig:absolute_error}
+    \end{subfigure}
+    \\
+    \begin{subfigure}[b]{0.45\textwidth}
+        \includegraphics[width=\textwidth, height=6cm, keepaspectratio]{figures/6.png}
+        \caption{初始损失下降（前 50 步）}
+        \label{fig:initial_loss}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.45\textwidth}
+        \includegraphics[width=\textwidth, height=6cm, keepaspectratio]{figures/7.png}
+        \caption{收敛损失（第 50 步之后）}
+        \label{fig:convergence_loss}
+    \end{subfigure}
+    \caption{训练过程与结果可视化。(a) 预测解与精确解对比，(b) 绝对误差分布，(c) 初始损失下降（前 50 步），(d) 收敛损失（第 50 步之后）。}
+    \label{fig:combined}
+\end{figure}
+ 
+
+\begin{table}[htbp]
+    \centering
+    \caption{预测解与解析解的部分数据对比}
+    \label{tab:solution_data}
+    \begin{tabular}{|c|c|c|}
+        \hline
+        $x$ & 预测解 & 解析解 \\ \hline
+        0.0000 & 0.000498 & 0.000000 \\ \hline
+        0.0101 & 0.006083 & 0.005102 \\ \hline
+        0.0202 & 0.011733 & 0.010305 \\ \hline
+        0.0303 & 0.017449 & 0.015611 \\ \hline
+        0.0404 & 0.023232 & 0.021018 \\ \hline
+        \vdots & \vdots & \vdots \\ \hline
+        0.9596 & 0.943819 & 0.940210 \\ \hline
+        0.9697 & 0.957579 & 0.955005 \\ \hline
+        0.9798 & 0.971285 & 0.969901 \\ \hline
+        0.9899 & 0.984930 & 0.984900 \\ \hline
+        1.0000 & 0.998504 & 1.000000 \\ \hline
     \end{tabular}
-    \end{table}
+\end{table}
 表显示，当使用更多的块时，深度 Ritz 方法没有给出更准确的近似解。然而，由于方程的复杂性，当块的数量增加到 2 个时，迭代过程中会出现过拟合现象。
+
+\newpage
+\subsection*{结果分析}
+
+Deep Ritz 方法在一维问题中表现出色，预测解与解析解高度一致（图 \ref{fig:predicted_vs_exact}），绝对误差保持在 \( 10^{-3} \) 数量级，最大误差 0.0006 出现在 \( x \approx 0.5 \) 附近（图 \ref{fig:absolute_error}），显示出较高的精度，但中间区域误差略高可能与网络捕捉高阶导数能力不足有关。训练时间 37.54 秒（图 \ref{fig:predicted_vs_exact}），初期损失从 300 快速下降至 1.78（图 \ref{fig:initial_loss}），后期平滑收敛至 0.96（图 \ref{fig:convergence_loss}），表明其计算效率高且优化稳定。相比传统有限元法，Deep Ritz 无需网格划分即可达到较低误差，计算复杂度集中于初期训练，适合高维问题和复杂几何场景，其灵活性和稳定性（图 \ref{fig:initial_loss} 和 \ref{fig:convergence_loss}）使其在避免维度灾难和处理非规则边界方面具有显著潜力，尽管超参数调优仍需进一步优化以提升适用性。
+    
 
 \chapter{伽辽金无网格法}
 
@@ -553,7 +610,7 @@ u(x) = \frac{x^2}{2} + \frac{x}{2}
 \end{equation}
 
 采用再生核近似方法（RKPM）进行离散，具体参数如下：
-线性基函数取 \( \boldsymbol{p}(x) = [1, x]^T \)，确保形函数再生 1 阶多项式。节点数为 \( NP = 5 \)，节点均匀分布于 \( [0, 1] \)，即 \( x_I = \{0.0, 0.25, 0.50, 0.75, 1.0\} \)。形函数影响域为 \( s = 0.5 \)，为节点间距 \( 0.25 \) 的 2 倍，保证足够覆盖。核函数采用三次样条核函数：
+线性基函数取 \( \boldsymbol{p}(x) = [1, x]^T \)，确保形函数再生 1 阶多项式。节点数为 \( NP = 11 \)，节点均匀分布于 \( [0, 1] \)，即 \( x_I = \{0.0, 0.10,0.20, \ldots, 1.0\} \)。形函数影响域为 \( s = 0.25 \)，为节点间距 \( 0.1 \) 的 2 倍，保证足够覆盖。核函数采用三次样条核函数：
 \begin{equation}
     \Phi(r) = 
     \begin{cases} 
@@ -638,12 +695,41 @@ u(x) = \frac{x^2}{2} + \frac{x}{2}
 \end{equation}
 其中，\( G_{I1} = \Psi_I(0) \)。
 
-在代码中，采用 \( n_g = 3 \) 的 3 点高斯积分：
-\begin{itemize}
-    \item 积分点：\( \xi_k = \left\{ -\sqrt{\frac{3}{5}}, 0, \sqrt{\frac{3}{5}} \right\} \)，即约 \( \{-0.7746, 0, 0.7746\} \)；
-    \item 权重：\( w_k = \left\{ \frac{5}{9}, \frac{8}{9}, \frac{5}{9} \right\} \)，即约 \( \{0.5556, 0.8889, 0.5556\} \)。
-\end{itemize}
-
+在代码中，采用了 \( n_g = 3 \) 的 3 点高斯积分方法。具体来说，积分点 \( \xi_k \) 取值为 \( \left\{ -\sqrt{\frac{3}{5}}, 0, \sqrt{\frac{3}{5}} \right\} \)，近似值为 \( \{-0.7746, 0, 0.7746\} \)。相应的权重 \( w_k \) 为 \( \left\{ \frac{5}{9}, \frac{8}{9}, \frac{5}{9} \right\} \)，近似值为 \( \{0.5556, 0.8889, 0.5556\} \)。这种高斯积分方法通过选择特定的积分点和权重，确保了数值积分的高精度。
+\newpage
+\begin{figure}[h]
+    \centering
+    \begin{minipage}{0.55\textwidth} % 调整宽度以避免重叠
+        \centering
+        \includegraphics[scale=0.5]{figures/3.png} % 减小缩放比例
+        \captionof{figure}{基于伽辽金型无网格方法的一维弹性杆问题数值结果}
+        \label{CHGraphsettings_fig1_meshfree}
+    \end{minipage}
+    \hfill
+    \begin{minipage}{0.40\textwidth} % 调整宽度以避免重叠
+        \centering
+        \begin{tabular}{cccc}
+            \toprule
+            $x$ & $u_{\text{exact}}$ & $u_{\text{computed}}$ & 误差 \\
+            \midrule
+            0.000 & 0.000000 & 0.000000 & 0.000000 \\
+            0.100 & 0.055000 & 0.054726 & 0.000274 \\
+            0.200 & 0.120000 & 0.118594 & 0.001406 \\
+            0.300 & 0.195000 & 0.193921 & 0.001079 \\
+            0.400 & 0.280000 & 0.278816 & 0.001184 \\
+            0.500 & 0.375000 & 0.373794 & 0.001206 \\
+            0.600 & 0.480000 & 0.478903 & 0.001097 \\
+            0.700 & 0.595000 & 0.593458 & 0.001542 \\
+            0.800 & 0.720000 & 0.719886 & 0.000114 \\
+            0.900 & 0.855000 & 0.850146 & 0.004854 \\
+            1.000 & 1.000000 & 1.000000 & 0.000000 \\
+            \bottomrule
+        \end{tabular}
+        \captionof{table}{解析解与计算解的对比}
+        \label{tab:exact_vs_computed}
+    \end{minipage}
+\end{figure}
+图 \ref{CHGraphsettings_fig1_meshfree} 和表 \ref{tab:exact_vs_computed} 展示了伽辽金无网格法（EFG 方法）在相同一维抛物线特性问题上的数值结果，其中解析解为 \( u(x) = 0.5x^2 + 0.5x \)。从图 \ref{fig:efg_solution} 可以看出，EFG 方法在简单一维问题上具有较高的精度。表 \ref{tab:efg_comparison} 进一步显示，EFG 方法的绝对误差在 \( x = 0.9 \) 处达到最大值 0.0048854，平均误差约为 0.0013，整体误差保持在 \( 10^{-3} \) 数量级，精度较高。与 Deep Ritz 方法相比，EFG 方法的误差分布较为均匀，最大误差（0.0048854）显著高于 Deep Ritz 方法的最大误差（0.0006），表明 Deep Ritz 方法在精度上更占优势，尤其在中间区域（\( x \approx 0.5 \)）的误差控制更优。然而，EFG 方法的计算效率可能更高，因为其基于离散节点的线性插值，不涉及神经网络的迭代训练，而 Deep Ritz 方法需要 37.54 秒的训练时间（10000 步）。从适用性来看，EFG 方法依赖于节点的均匀分布，适合规则几何问题，但在高维或复杂几何问题中，节点生成和插值计算复杂度会显著增加，而 Deep Ritz 方法通过神经网络逼近解，无需显式网格划分，在高维问题中更具潜力。此外，EFG 方法的误差在边界附近（如 \( x = 0.9 \)）较大，可能与边界条件处理有关，而 Deep Ritz 方法通过惩罚项（penalty=500）更有效地约束了边界条件（\( u(0) = 0, u(1) = 1 \)）。综合来看，EFG 方法在简单问题上计算效率更高，但 Deep Ritz 方法在精度和高维适用性上展现出更大的优势，适合复杂问题场景。  
 
 \chapter{图表设置}
 \subsection*{单张}
@@ -651,7 +737,7 @@ u(x) = \frac{x^2}{2} + \frac{x}{2}
     \centering
     \includegraphics[scale=0.4]{figures/1.png}
     \caption{\centering{边界点处无网格形函数}}
-    \label{CHGraphsettings_fig1_meshfree}
+    \label{CHGraphsettings_fig1_meshfree1}
 \end{figure}
 单张图片Latex代码
 \begin{lstlisting}
@@ -659,7 +745,7 @@ u(x) = \frac{x^2}{2} + \frac{x}{2}
 \centering-居中
 \includegraphics[scale=0.4]{figures/1.png}-大小、图片路径
 \caption{\centering{边界点处无网格形函数}}-图名
-\label{CHGraphsettings_fig1_meshfree}-命名
+\label{CHGraphsettings_fig1_meshfree1}-命名
 \end{figure}
 \end{lstlisting}
 \newpage
