@@ -270,26 +270,26 @@
     \centering
     \begin{subfigure}[b]{0.8\textwidth}
         \centering
-        \includegraphics[width=\textwidth, height=6cm, keepaspectratio]{figures/4.png}
+        \includegraphics[width=\textwidth, height=6cm, keepaspectratio]{figures/3-2-1.png}
         \caption{预测解与精确解对比}
         \label{fig:predicted_vs_exact}
     \end{subfigure}
     \hfill
-    \begin{subfigure}[b]{0.8\textwidth}
+    \begin{subfigure}[b]{0.9\textwidth}
         \centering
-        \includegraphics[width=\textwidth, height=6cm, keepaspectratio]{figures/5.png}
+        \includegraphics[width=\textwidth, height=6cm, keepaspectratio]{figures/3-2-2.png}
         \caption{绝对误差分布}
         \label{fig:absolute_error}
     \end{subfigure}
     \\
     \begin{subfigure}[b]{0.45\textwidth}
-        \includegraphics[width=\textwidth, height=6cm, keepaspectratio]{figures/6.png}
+        \includegraphics[width=\textwidth, height=6cm, keepaspectratio]{figures/3-2-3.png}
         \caption{初始损失下降（前 50 步）}
         \label{fig:initial_loss}
     \end{subfigure}
     \hfill
     \begin{subfigure}[b]{0.45\textwidth}
-        \includegraphics[width=\textwidth, height=6cm, keepaspectratio]{figures/7.png}
+        \includegraphics[width=\textwidth, height=6cm, keepaspectratio]{figures/3-2-4.png}
         \caption{收敛损失（第 50 步之后）}
         \label{fig:convergence_loss}
     \end{subfigure}
@@ -325,7 +325,27 @@
 
 Deep Ritz 方法在一维问题中表现出色，预测解与解析解高度一致（图 \ref{fig:predicted_vs_exact}），绝对误差保持在 \( 10^{-3} \) 数量级，最大误差 0.006 出现在 \( x \approx 0.5 \) 附近（图 \ref{fig:absolute_error}），显示出较高的精度，但中间区域误差略高可能与网络捕捉高阶导数能力不足有关。训练时间 37.54 秒（图 \ref{fig:predicted_vs_exact}），初期损失从 300 快速下降至 1.78（图 \ref{fig:initial_loss}），后期平滑收敛至 0.96（图 \ref{fig:convergence_loss}），表明其计算效率高且优化稳定。相比传统有限元法，Deep Ritz 无需网格划分即可达到较低误差，计算复杂度集中于初期训练，适合高维问题和复杂几何场景，其灵活性和稳定性（图 \ref{fig:initial_loss} 和 \ref{fig:convergence_loss}）使其在避免维度灾难和处理非规则边界方面具有显著潜力，尽管超参数调优仍需进一步优化以提升适用性。
     
+\begin{figure}[htbp]
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+        \includegraphics[width=\textwidth, height=6cm, keepaspectratio]{figures/3-2-1.png}
+        \caption{深度Ritz法-10000步训练}
+        \label{fig:predicted_vs_exact}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+        \includegraphics[width=\textwidth, height=6cm, keepaspectratio]{figures/3-1-1.png}
+        \caption{深度Ritz法-1000步训练}
+        \label{fig:absolute_error}
+    \end{subfigure}
+  
+    \caption{拟合情况。(a) 深度Ritz法-10000步训练，(b) 深度Ritz法-1000步训练。}
+    \label{fig:combined}
+\end{figure}
 
+深度 Ritz 方法在 1000 步训练时的拟合失败情况显著，如图 3.2(b) 所示，预测解（蓝色曲线）与精确解（橙色曲线）存在明显偏差。这表明模型在有限迭代步数下未能充分收敛，说明训练步数不足以优化网络参数 \(\theta\)，权重未适配短时训练。相比之下，10000 步训练（图 3.2(a)）显示预测解与精确解几乎重合，验证了深度Ritz法迭代次数的重要性。
 \chapter{伽辽金无网格法}
 
 \section{弱形式推导}
@@ -703,7 +723,7 @@ u(x) = \frac{x^2}{2} + \frac{x}{2}
     \centering
     \begin{minipage}{0.55\textwidth} % 调整宽度以避免重叠
         \centering
-        \includegraphics[scale=0.5]{figures/3.png} % 减小缩放比例
+        \includegraphics[scale=0.5]{figures/4-1.png} % 减小缩放比例
         \captionof{figure}{基于伽辽金型无网格方法的一维弹性杆问题数值结果}
         \label{CHGraphsettings_fig1_meshfree}
     \end{minipage}
@@ -733,6 +753,198 @@ u(x) = \frac{x^2}{2} + \frac{x}{2}
 \end{figure}
 图 \ref{CHGraphsettings_fig1_meshfree} 和表 \ref{tab:exact_vs_computed} 展示了伽辽金无网格法（EFG 方法）在相同一维抛物线特性问题上的数值结果，其中解析解为 \( u(x) = 0.5x^2 + 0.5x \)。从图 \ref{CHGraphsettings_fig1_meshfree} 可以看出，EFG 方法在简单一维问题上具有较高的精度。表 \ref{tab:exact_vs_computed} 进一步显示，EFG 方法的绝对误差在 \( x = 0.9 \) 处达到最大值 0.0048854，平均误差约为 0.0013，整体误差保持在 \( 10^{-3} \) 数量级，精度较高。与 Deep Ritz 方法相比，EFG 方法的误差分布较为均匀，EFG 方法的计算效率可能更高，因为其基于离散节点的线性插值，不涉及神经网络的迭代训练，而 Deep Ritz 方法需要 37.54 秒的训练时间（10000 步）。从适用性来看，EFG 方法依赖于节点的均匀分布，适合规则几何问题，但在高维或复杂几何问题中，节点生成和插值计算复杂度会显著增加，而 Deep Ritz 方法通过神经网络逼近解，无需显式网格划分，在高维问题中更具潜力。此外，EFG 方法的误差在边界附近（如 \( x = 0.9 \)）较大，可能与边界条件处理有关，而 Deep Ritz 方法通过惩罚项（penalty=500）更有效地约束了边界条件（\( u(0) = 0, u(1) = 1 \)）。综合来看，EFG 方法在简单问题上计算效率更高，但 Deep Ritz 方法在精度和高维适用性上展现出更大的优势，适合复杂问题场景。  
 
+\chapter{再生核近似增强深度Ritz方法}
+
+\section{再生核近似增强}
+
+\subsection{标准深度 Ritz 方法}
+标准深度 Ritz 方法（Deep Ritz Method, DRM）是一种基于变分原理的 PDE 求解方法，其核心是将试探函数表示为神经网络：
+\begin{equation}
+u_\theta(x) = NN(x; \theta),
+\end{equation}
+其中 \(NN(x; \theta)\) 是一个全连接神经网络，输入为空间坐标 \(x \in \mathbb{R}^d\)，输出为标量 \(u_\theta(x)\)，\(\theta\) 是网络参数。DRM 的本质在于利用神经网络的通用逼近能力，通过最小化能量泛函来近似 PDE 的解。对于泊松方程 \(-\nabla^2 u = f\)，其损失函数为：
+\begin{equation}
+L(\theta) = \int_\Omega \left[ \frac{1}{2} |\nabla u_\theta|^2 - f u_\theta \right] d\Omega + \lambda \int_{\partial \Omega} (u_\theta - g)^2 ds,
+\end{equation}
+其中第一项是体能量，第二项是边界惩罚，\(\lambda\) 是惩罚系数。能量积分通过数值采样（如蒙特卡洛方法）近似，梯度 \(\nabla u_\theta\) 由自动求导计算。
+
+DRM 的优势在于其灵活性和对高维问题的适应性，但其局限性在于仅依赖全局坐标 \(x\)，难以捕捉解的局部几何特性，同时通过惩罚项强制满足边界条件可能导致边界处误差较大。此外，对复杂解的逼近可能需要更深的网络或更长的训练时间。这些不足为增强型方法的提出提供了动机。
+这些不足促使了增强型方法的提出。
+
+\subsection{增强机制：MLS 形函数}
+增强型深度 Ritz 方法引入移动最小二乘法（MLS）形函数 \(\Psi(x)\) 来改进试探函数。MLS 形函数已在伽辽金无网格法章节详细推导，这里简述其构造：
+给定节点集 \(\{x_j\}_{j=1}^N\)，形函数定义为：
+\begin{equation}
+u_h(x) = \sum_{j=1}^N \Psi_j(x) u_j,
+\end{equation}
+满足单位分解性 \(\sum_{j=1}^N \Psi_j(x) = 1\)。其计算简化为：
+\begin{equation}
+\Psi(x) = p^T(x, x) A^{-1}(x) B(x),
+\end{equation}
+
+形函数 \(\Psi(x)\) 的输出形状为 \((batch\_size, N)\)，表示 \(x\) 对每个节点的插值权重。
+\begin{comment}
+其中：
+线性基函数\(p(x_j, x)=[1, (x_j - x)/s]\)，支持域尺度\(s\) 
+三次样条核函数\(\phi(r)\) 
+\(A(x) = \sum_{j=1}^N \phi_j(x) p(x_j, x) p^T(x_j, x)\)，\(B(x) = [\phi_1(x) p(x_1, x), \dots, \phi_N(x) p(x_N, x)]\)。\\
+\end{comment}
+\subsection{神经网络模块与特征拼接}
+增强型 Ritz 方法的核心在于通过特征拼接整合 MLS 形函数与神经网络。试探函数构造为：
+\begin{equation}
+u_\theta(x) = NN(z(x); \theta), \quad z(x) = [x, \Psi(x)],
+\end{equation}
+其中 \(z(x)\) 是增强输入特征，\(\oplus\) 表示拼接操作。
+
+\subsubsection{特征拼接的详细描述}
+原始输入 \(x\) 的形状为 \((batchsize, d)\)，在 \(d=1\) 的情况下为 \((batchsize, 1)\)，表示采样点的坐标，提供全局位置信息。形函数 \(\Psi(x)\) 的形状为 \((batchsize, N)\)，其中每个元素 \(\Psi_j(x)\) 表示 \(x\) 受节点 \(x_j\) 的影响程度，编码了局部几何特性。拼接过程在张量维度上沿特征轴（第 1 维）连接，形式为：
+\begin{equation}
+z(x) = [x_1, \Psi_1(x), \Psi_2(x), \dots, \Psi_N(x)],
+\end{equation}
+其中 \(x_1\) 是 \(x\) 的第 1 维坐标（在一维情况下）。对于批量输入，\(z(x)\) 的形状为 \((batchsize, 1 + N)\)。从数学意义上，\(x\) 提供全局上下文，确保网络感知整体空间位置，而 \(\Psi(x)\) 引入局部插值信息，使网络能够感知离散节点的分布以及支持域内的几何关系。拼接后的 \(z(x)\) 是一个复合特征向量，融合了全局和局部信息，从而增强了网络的表达能力。这种增强机制通过 \(\Psi(x)\) 的紧支撑性使网络对 \(x\) 附近节点的贡献更敏感，改善局部解的精度，同时形函数的单位分解性有助于将边界条件嵌入解中，减少对惩罚项的依赖。此外，拼接特征为神经网络提供了更丰富的输入空间，使其能够学习更复杂的解模式。
+
+增强型网络 \(NN(z(x); \theta)\) 的结构包括输入层、隐藏层和输出层。输入层的维度为 \(d + N\)（例如 \(1 + N\)），负责接受 \(z(x)\) 作为输入。隐藏层由 \(L\) 层全连接网络组成，每层宽度为 \(width\)，其计算形式为：
+\begin{equation}
+h_{l+1} = \tanh(W_l h_l + b_l), \quad h_0 = z(x), \quad l = 0, 1, \dots, L-1,
+\end{equation}
+其中 \(W_l\) 和 \(b_l\) 是可训练参数，\(\tanh\) 函数提供非线性变换。输出层通过线性投影得到结果，形式为：
+\begin{equation}
+u_\theta(x) = W_L h_L + b_L,
+\end{equation}
+输出标量 \(u_\theta(x)\)。这种结构确保了网络能够有效处理增强特征并生成 PDE 的近似解。
+
+\section{模块整合}
+增强型试探函数整合了 MLS 和神经网络：
+\[
+u_\theta(x) = NN([x, \Psi(x)]; \theta),
+\]
+其中 \(\Psi(x) = p^T(x, x) A^{-1}(x) B(x)\)。这种整合使网络同时具备局部插值（MLS）和全局非线性拟合（神经网络）的能力。
+
+基于 Ritz 变分原理，损失函数简化为：
+\begin{equation}
+\mathcal{L}(\theta) = \frac{1}{N_b} \sum_{i=1}^{N_b} \left[ \frac{1}{2} |\nabla u_\theta(x_i)|^2 - f(x_i) u_\theta(x_i) \right] + \lambda \left[ u_\theta(0)^2 + (u_\theta(1) - 1)^2 \right],
+\end{equation}
+其中 \(N_b\) 是内部采样点数，\(\lambda\) 是边界惩罚系数。详细推导见伽辽金无网格法章节。
+
+\section{训练算法}
+基于增强深度 Ritz 方法的大致步骤为\\
+1. 初始化：设定网络参数 \(\theta\)、节点集 \(\{x_I\}\)、支持域 \(s\)、学习率 \(\eta\)。\\
+2. 采样：随机生成内部点 \(\{x_i^b\}\) 和边界点 \(\{0, 1\}\)。\\
+3. 前向传播：计算 \(\Psi(x_i^b)\)，拼接特征 \(z(x_i^b)\)，输出 \(u_\theta(x_i^b)\) 和 \(\nabla u_\theta(x_i^b)\)。\\
+4. 损失计算：评估能量项和边界项，得到 \(\mathcal{L}(\theta)\)。\\
+5. 优化：通过反向传播更新 \(\theta\)，重复直到收敛。
+
+\section{数值结果}
+设真解 \(u \in H^2(\Omega)\)，存在 \(\theta\) 使得：
+\[
+\|u - u_\theta\|_{H^1} \leq C_1 h + C_2 \epsilon_{\text{NN}},
+\]
+其中 \(h\) 是节点间距，\(\epsilon_{\text{NN}}\) 是网络逼近误差，\(C_1, C_2\) 是常数。训练稳定性由梯度下降保证：
+\[
+\mathcal{L}(\theta_{k+1}) \leq \mathcal{L}(\theta_k) - \frac{\eta}{2} \|\nabla \mathcal{L}(\theta_k)\|^2, \quad \eta < 2/L。
+\]
+\subsection*{数值结果}
+\begin{figure}[htbp]
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+        \includegraphics[width=\textwidth, height=6cm, keepaspectratio]{figures/3-1-1.png}
+        \caption{深度Ritz法1000步拟合结果}
+        \label{fig:deepritz_solutions}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+        \includegraphics[width=\textwidth, height=6cm, keepaspectratio]{figures/5-1-1.png}
+        \caption{再生核增强深度Ritz法1000步拟合结果}
+        \label{fig:absolute_error}
+    \end{subfigure}
+    \\
+    \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+        \includegraphics[width=\textwidth, height=6cm, keepaspectratio]{figures/3-2-1.png}
+        \caption{深度Ritz法10000步拟合结果}
+        \label{fig:deepritz_solutions}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+        \includegraphics[width=\textwidth, height=6cm, keepaspectratio]{figures/5-2-1.png}
+        \caption{再生核增强深度Ritz法10000步拟合结果}
+        \label{fig:absolute_error}
+    \end{subfigure}
+    \begin{comment}
+    \\
+
+    \begin{subfigure}[b]{0.45\textwidth}
+        \includegraphics[width=\textwidth, height=6cm, keepaspectratio]{figures/3-2-5.png}
+        \caption{前1000步损失下降曲线（深度Ritz法）}
+        \label{fig:initial_loss}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.45\textwidth}
+        \includegraphics[width=\textwidth, height=6cm, keepaspectratio]{figures/5-1-4.png}
+        \caption{前1000步损失下降曲线（再生核增强）}
+        \label{fig:convergence_loss}
+    \end{subfigure}
+    \\
+    \begin{subfigure}[b]{0.45\textwidth}
+        \includegraphics[width=\textwidth, height=6cm, keepaspectratio]{figures/3-2-4.png}
+        \caption{前10000步损失下降曲线（深度Ritz法）}
+        \label{fig:initial_loss}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.45\textwidth}
+        \includegraphics[width=\textwidth, height=6cm, keepaspectratio]{figures/5-2-4.png}
+        \caption{前10000步损失下降曲线（再生核增强）}
+        \label{fig:convergence_loss}
+    \end{subfigure}
+    \end{comment}
+    \centering
+    \caption{训练结果可视化。}
+    \label{fig:combined}
+\end{figure}
+图 5.1 展示了深度 Ritz 方法和再生核增强深度 Ritz 方法在不同训练步数下的预测解与精确解的对比结果。在图 5.1(a) 中，深度 Ritz 方法在 1000 步训练（width=50, depth=1, penalty=500, trainTime=3.61s）后，模型在有限步数下未能充分收敛。图 5.1(b) 展示的再生核增强深度 Ritz 方法在相同 1000 步训练下，预测解与精确解的偏差明显减小，曲线更贴近精确解，表明增强方法通过引入 MLS 形函数提升了局部拟合能力。
+
+图 5.1(c) 和 5.1(d) 进一步对比了两者在 10000 步训练时的表现。在图 5.1(c) 中，深度 Ritz 方法（width=50, depth=1, penalty=500, trainTime=37.75s）经过 10000 步训练后，预测解与精确解几乎完全重合，拟合效果显著提升，表明增加训练步数有助于优化网络参数 \(\theta\)，使其更好地逼近精确解 \(u(x) = \frac{1}{2}x^2 + \frac{1}{2}x\)。
+\newpage
+\begin{figure}[htbp]
+    \centering
+
+    \begin{subfigure}[b]{0.45\textwidth}
+        \includegraphics[width=\textwidth, height=6cm, keepaspectratio]{figures/3-1-3.png}
+        \caption{前1000步损失下降曲线（深度Ritz法）}
+        \label{fig:initial_loss}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.45\textwidth}
+        \includegraphics[width=\textwidth, height=6cm, keepaspectratio]{figures/5-1-4.png}
+        \caption{前1000步损失下降曲线（再生核增强）}
+        \label{fig:convergence_loss}
+    \end{subfigure}
+    \\
+    \begin{subfigure}[b]{0.45\textwidth}
+        \includegraphics[width=\textwidth, height=6cm, keepaspectratio]{figures/3-2-4.png}
+        \caption{前10000步损失下降曲线（深度Ritz法）}
+        \label{fig:initial_loss}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.45\textwidth}
+        \includegraphics[width=\textwidth, height=6cm, keepaspectratio]{figures/5-2-4.png}
+        \caption{前10000步损失下降曲线（再生核增强）}
+        \label{fig:convergence_loss}
+    \end{subfigure}
+    
+    \centering
+    \caption{训练过程可视化。}
+    \label{fig:combined}
+\end{figure}
+
+图 5.2(a) 说明深度 Ritz 方法初始损失约为 \(1.06\)，随着步数增加逐渐下降至约 \(1.046\)，损失函数下降较慢，且存在局部波动。相比之下，展示的再生核增强深度 Ritz 方法在相同 1000 步训练后，损失从初始值迅速下降至约 \(0.958\)，曲线更加平滑，表明再生核增强了模型的稳定性，损失函数平滑且迅速收敛。
+
+图 5.2(c) 给出了深度 Ritz 方法在 10000 步训练后的损失收敛情况，初始损失约为 \(1.03\)，在早期快速下降后趋于平稳，最终稳定在约 \(0.99\) 附近，显示出较好的收敛性。图 5.2(d) 呈现了再生核增强深度 Ritz 方法在 10000 步训练后的损失变化，初始损失约为 \(0.962\)，随后快速下降并稳定在约 \(0.958\) 左右，曲线几乎无波动，表明增强方法在长期训练中表现出更高的稳定性和收敛效率。
+
+通过对比分析，两种方法在 1000 步训练时的损失值均较高，深度 Ritz 方法的损失 (\(1.046\)) 显著高于再生核增强方法 (\(0.958\))，这反映了增强方法在短时训练中通过局部几何信息的引入获得了更好的初始拟合能力。然而，两种方法在 10000 步训练后均趋于收敛，增强方法的最终损失 (\(0.958\)) 略低于深度 Ritz 方法 (\(0.99\))，表明其在长期训练中仍保持轻微优势，尤其是在损失的稳定性上更为突出。
 \chapter{图表设置}
 \subsection*{单张}
 \begin{figure}[H]
