@@ -145,38 +145,84 @@
 \section{Ritz 方法}
 变分法在解决边界值问题中发挥着至关重要的作用，其核心思想在于通过构建一个泛函并寻找其极值来间接找到方程的解。Ritz 法是一种常用的近似解法。根据最小势能原理，如果能够列出所有的几何可能位移，那么使总势能取最小值的那一组位移就是真实位移。
 
-变分法将原问题转化为求解泛函极小值的问题，从而将微分方程求解转化为一个优化问题。Ritz法通过将假设的解代入泛函中，构造关于假设解参数的表达式，通过优化参数使泛函达到极值，实现泛函最小化。例如求解泊松方程，可构造能量泛函：
+以一维泊松方程为例，其强形式为：
+\begin{equation}
+    -\frac{d^2 u}{dx^2} = f(x), \quad x \in (0, 1)
+    \label{eq:poisson_strong}
+\end{equation}
+并施加 Dirichlet 边界条件 \( u(0) = 0 \), \( u(1) = 0 \)。为了将其转化为泛函最小值问题，首先构造弱形式。
+
+乘以测试函数 \( v \in H^1_0(0,1) \)（满足边界条件 \( v(0) = v(1) = 0 \)），并对定义域积分：
+\begin{equation}
+    \int_0^1 -\frac{d^2 u}{dx^2} v \, dx = \int_0^1 f v \, dx
+    \label{eq:poisson_integral}
+\end{equation}
+使用分部积分：
+\[
+\int_0^1 -\frac{d^2 u}{dx^2} v \, dx = \left[ -\frac{du}{dx} v \right]_0^1 + \int_0^1 \frac{du}{dx} \frac{dv}{dx} \, dx
+\]
+由于 \( v(0) = v(1) = 0 \)，边界项消失，得到弱形式：
+\begin{equation}
+    \int_0^1 \frac{du}{dx} \frac{dv}{dx} \, dx = \int_0^1 f v \, dx
+    \label{eq:poisson_weak}
+\end{equation}
+弱形式的解 \( u \) 等价于使以下能量泛函取最小值：
 \begin{equation}
     J[u] = \int_{\Omega} \left( \frac{1}{2} |\nabla u|^2 - f u \right) \, d\Omega
     \label{eq:energy_functional}
     \end{equation}
-该泛函的极小值对应原微分方程的解，即求解微分方程等价于寻找使 \( J[u] \) 最小的函数 \( u \)。
+即求解微分方程等价于寻找使 \( J[u] \) 最小的函数 \( u \)。Ritz法通过将假设的解代入泛函中，构造关于假设解参数的表达式，通过优化参数使泛函达到极值，实现泛函最小化。例如：
+
+
 
 选择一组满足边界条件的基函数（如多项式、三角函数或分段多项式），构造近似解：
 \begin{equation}
     u_h(x) = \sum_{i=1}^n c_i \phi_i(x)
     \label{eq:approx_solution}
     \end{equation}
-其中 \( c_i \) 为待定系数。
+其中 \( c_i \) 为待定系数，\( \phi_i(x) \) 是基函数。
 
 将近似解代入泛函，得到关于系数的多元函数：
 \begin{equation}
     J(c_1, c_2, \dots, c_n) = \int_{\Omega} \left( \frac{1}{2} \left| \nabla \sum c_i \phi_i \right|^2 - f \sum c_i \phi_i \right) \, d\Omega
     \label{eq:functional_coeffs}
-    \end{equation}
-例如，对于泊松方程，泛函变为二次型：
+\end{equation}
+
+    展开泛函：
+    \[
+    \nabla u_h = \nabla \left( \sum_{i=1}^n c_i \phi_i \right) = \sum_{i=1}^n c_i \frac{d \phi_i}{dx}
+    \]
+    \[
+    \left| \nabla u_h \right|^2 = \left( \sum_{i=1}^n c_i \frac{d \phi_i}{dx} \right) \left( \sum_{j=1}^n c_j \frac{d \phi_j}{dx} \right) = \sum_{i=1}^n \sum_{j=1}^n c_i c_j \frac{d \phi_i}{dx} \frac{d \phi_j}{dx}
+    \]
+    代入泛函：
+    \[
+    J(c_1, c_2, \dots, c_n) = \int_0^1 \left( \frac{1}{2} \sum_{i=1}^n \sum_{j=1}^n c_i c_j \frac{d \phi_i}{dx} \frac{d \phi_j}{dx} - f \sum_{i=1}^n c_i \phi_i \right) \, dx
+    \]
+    定义刚度矩阵 \( K \) 和载荷向量 \( \mathbf{f} \)：
+    \[
+    K_{ij} = \int_0^1 \frac{d \phi_i}{dx} \frac{d \phi_j}{dx} \, dx, \quad f_i = \int_0^1 f \phi_i \, dx
+    \]
+泛函变为二次型：
 \begin{equation}
     J(c) = \frac{1}{2} c^T K c - f^T c
     \label{eq:quadratic_form}
-    \end{equation}
-其中 \( K \) 为刚度矩阵，\( f \) 为载荷向量。
+\end{equation}
+其中 \( \mathbf{c} = [c_1, c_2, \dots, c_n]^T \)，\( K \) 为对称正定矩阵（因 \( K_{ij} = K_{ji} \)，且 \( \mathbf{c}^T K \mathbf{c} = \int_0^1 \left| \nabla u_h \right|^2 \, dx \geq 0 \)），\( \mathbf{f} = [f_1, f_2, \dots, f_n]^T \)。
 
-对 \( J \) 求极值（即对所有 \( c_i \) 求偏导并令为零），得到线性方程组：
-\begin{equation}
-    K c = f
-    \label{eq:linear_system}
+
+对 \( J(\mathbf{c}) \) 求极值，即对 \( \mathbf{c} \) 求导：
+    \[
+    \frac{\partial J}{\partial \mathbf{c}} = K \mathbf{c} - \mathbf{f} = 0
+    \]
+得到线性方程组：
+    \begin{equation}
+        K \mathbf{c} = \mathbf{f}
+        \label{eq:linear_system}
     \end{equation}
-解此方程组即得最优系数，从而确定近似解。
+解此方程组即得最优系数 \( \mathbf{c} \)，从而确定近似解 \( u_h(x) \)。
+    
+
 
 \section{深度 Ritz 方法}
 有限元方法(FEM)、虚拟元方法(VEM)都受网格剖分的限  制,只有当网格剖分达到足够精细的程度时,才能满足计算精度的要求,这将不可避免增  加计算的时间和成本。但深度 Ritz 法不受网格剖分的限制,传统方法中，基函数是预先选定的，深度 Ritz 方法用神经网络作为基函数的表示，即由深度神经网络定义的非线性变换。选择能量泛函作为损失函数，通过优化神经网络参数来最小化泛函，从而代替方程求解。
@@ -372,7 +418,7 @@ Deep Ritz 方法在一维问题中表现出色，预测解与解析解高度一�
 其中，\(\Phi(x - x_I)\) 表示核函数，用于定义形函数的权重分布，通常具有有限支撑（如三次样条核函数），衡量点 \( x \) 与节点 \( x_I \) 之间的距离影响。
 离散化为：
 \begin{equation}
-    u^h(x) = \sum_{I=1}^{N} \Phi(x - x_I) u(x_I) \Delta V_I
+    u^h(x) = \sum_{I=1}^{N} \Phi(x_I - x) u(x_I) \Delta V_I
     \label{eq:rka_discrete}
 \end{equation}
 为保证多项式再生性，修正为：
@@ -382,7 +428,7 @@ Deep Ritz 方法在一维问题中表现出色，预测解与解析解高度一�
 \end{equation}
 其中，形函数定义为：
 \begin{equation}
-    \Psi_I(x) = \boldsymbol{p}^T(x) \boldsymbol{b}(x) \Phi(x - x_I) \Delta V_I
+    \Psi_I(x) = \boldsymbol{p}^T(x) \boldsymbol{b}(x) \Phi(x_I - x) \Delta V_I
     \label{eq:shape_function1}
 \end{equation}
 
@@ -395,12 +441,12 @@ Deep Ritz 方法在一维问题中表现出色，预测解与解析解高度一�
 \end{equation}
 代入 \eqref{eq:shape_function1}：
 \begin{equation}
-    \sum_{I=1}^{N} \boldsymbol{p}^T(x) \boldsymbol{b}(x) \Phi(x - x_I) p_k(x_I) \Delta V_I = p_k(x)
+    \sum_{I=1}^{N} \boldsymbol{p}^T(x) \boldsymbol{b}(x) \Phi(x_I - x) p_k(x_I) \Delta V_I = p_k(x)
     \label{eq:reproducing_substituted}
 \end{equation}
 定义矩量矩阵：
 \begin{equation}
-    \boldsymbol{M}(x) = \sum_{I=1}^{N} \Phi(x - x_I) \boldsymbol{p}(x_I) \boldsymbol{p}^T(x_I) \Delta V_I
+    \boldsymbol{M}(x) = \sum_{I=1}^{N} \Phi(x_I - x) \boldsymbol{p}(x_I) \boldsymbol{p}^T(x_I) \Delta V_I
     \label{eq:moment_matrix}
 \end{equation}
 则：
@@ -417,10 +463,31 @@ Deep Ritz 方法在一维问题中表现出色，预测解与解析解高度一�
 \subsection{无网格形函数}
 代入 \eqref{eq:shape_function1}：
 \begin{equation}
-    \Psi_I(x) = \boldsymbol{p}^T(x) \boldsymbol{M}^{-1}(x) \boldsymbol{p}(x_I) \Phi(x - x_I) \Delta V_I
+    \Psi_I(x) = \boldsymbol{p}^T(x_I) \boldsymbol{M}^{-1}(x) \boldsymbol{p}(x) \Phi(x_I - x) \Delta V_I
     \label{eq:meshless_shape_function}
 \end{equation}
-此形函数满足 \( m \) 阶多项式再生性。
+此形函数满足 \( m \) 阶多项式再生性。为了验证数值近似 \(\boldsymbol{A}(x)\) 的性状，可以采用移动基函数 \(\boldsymbol{p}(x_I - x)\)。将其代入 \eqref{eq:rka_corrected} 得出如下再生条件：
+\begin{equation}
+    \sum_{I=1}^{NP} \Psi_I(x) \boldsymbol{p}( x_I - x) = \boldsymbol{p}(0)
+    \label{eq:reproduction_condition}
+\end{equation}
+此时假设：
+\begin{equation}
+    \Psi_I(x) = \boldsymbol{p}^T(x_I - x) \boldsymbol{c}(x) \phi( x_I - x)
+    \label{eq:shape_with_correction}
+\end{equation}
+将表达式 \eqref{eq:shape_with_correction} 代入 \eqref{eq:reproduction_condition}，有：
+\begin{equation}
+    \boldsymbol{c}(x) = \boldsymbol{A}^{-1}(x) \boldsymbol{p}( 0)
+    \label{eq:correction_coefficient}
+\end{equation}
+
+由此，采用移动基函数 \(\boldsymbol{p}( x - x_I)\) 的无网格形函数为：
+\begin{equation}
+    \Psi_I(x) = \boldsymbol{p}^T(0) \boldsymbol{A}^{-1}(x) \boldsymbol{p}( x_I - x) \phi( x_I - x)
+    \label{eq:shape_moving}
+\end{equation}
+
 
 \subsection{位移和应变离散化}
 使用再生核近似：
@@ -477,7 +544,7 @@ Deep Ritz 方法在一维问题中表现出色，预测解与解析解高度一�
 \end{equation}
 
 
-
+\newpage
 \section{拉格朗日乘子法}
 
 由于无网格形函数通常不具有插值特性,因此需要采用适当的方法施加强制边界条件，拉格朗日乘子法是一种在数值方法中施加约束条件的强大工具，广泛应用于有限元法、无网格法等场景。其核心在于通过构造增广泛函，将原始问题的能量泛函与约束条件结合，确保解同时满足物理方程和附加约束。
