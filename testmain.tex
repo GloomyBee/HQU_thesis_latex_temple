@@ -3,6 +3,7 @@
 
 \documentclass[engineeringmaster]{hquThesis}
 
+\usepackage{pgfplots}
 \usepackage{lineno}
 \usepackage{amsmath,amsfonts,amssymb,textcomp,ulem}
 \usepackage{booktabs,multirow,tabularx,float}
@@ -46,8 +47,13 @@
 本文第四部分研究基于再生核近似的增强深度利兹法。分析再生核近似的高精度逼近特性与深度利兹法的变分求解原理，推导两者结合的数学框架，探索增强深度利兹法的理论可行性。利用Python编程设计增强算法模型，将再生核形函数融入神经网络结构，改进损失函数，在数值验证与分析中，以一维拉压杆问题为对象，验证增强方法的性能。
 
 \clearpage
-\chapter{一维拉压杆模型的计算方法}
-\section{平衡微分方程}
+
+\newpage
+\chapter{深度Ritz计算方法}
+本章运用深度 Ritz 方法对一维线弹性夹紧板模型进行数值计算，深度 Ritz 方法其核心思想是将变分问题转化为优化问题，通过深度学习框架高效求解偏微分方程。即通过构造一个神经网络来逼近问题的解，利用变分原理将 PDE 的满足转化为能量泛函的最小化问题，从而避免了传统数值方法中网格划分的复杂性。本章最后针对一维拉压杆问题进行数值分析以及数值实验。
+
+\section{一维拉压杆模型的计算方法}
+\section*{平衡微分方程}
 考虑一均匀等截面杆，长度为 \( l \)，横截面积为 \( A \)，弹性模量为 \( E \)。杆的左端固定（位移为零），右端施加拉力 \( F \)，杆整体施加单位长度的体力 \( q \)（假设为常数）。取一微元体，考虑微元的受力平衡：左侧轴力 \( N(x) \)，方向为 \( x \) 轴负方向；右侧轴力 \( N(x + dx) \)，方向为 \( x \) 轴正方向。由 \( x \) 方向的平衡方程有：
 \begin{equation}
     N(x + dx) - N(x) + q \, dx = 0
@@ -74,7 +80,7 @@
     \label{eq:equilibrium4}
 \end{equation}
 
-\section{边界条件}
+\section*{边界条件}
 左端固定：
 \begin{equation}
     u(0) = 0
@@ -97,8 +103,7 @@
     \label{eq:strong_form_system}
 \end{equation}
 
-\newpage
-\section{解析解的推导}
+\section*{解析解的推导}
 对 \eqref{eq:equilibrium4} 进行积分：
 \begin{enumerate}
     \item 第一次积分：
@@ -136,11 +141,6 @@
     u(x) = \frac{q}{2EA} x^2 + \frac{F - q l}{EA} x
     \label{eq:analytical_solution}
 \end{equation}
-
-
-\newpage
-\chapter{深度Ritz计算方法}
-本章运用深度 Ritz 方法对一维线弹性夹紧板模型进行数值计算，深度 Ritz 方法其核心思想是将变分问题转化为优化问题，通过深度学习框架高效求解偏微分方程。即通过构造一个神经网络来逼近问题的解，利用变分原理将 PDE 的满足转化为能量泛函的最小化问题，从而避免了传统数值方法中网格划分的复杂性。本章最后针对一维拉压杆问题进行数值分析以及数值实验。
 
 \section{Ritz 方法}
 变分法在解决边界值问题中发挥着至关重要的作用，其核心思想在于通过构建一个泛函并寻找其极值来间接找到方程的解。Ritz 法是一种常用的近似解法。根据最小势能原理，如果能够列出所有的几何可能位移，那么使总势能取最小值的那一组位移就是真实位移。
@@ -314,36 +314,36 @@
 
 \begin{figure}[htbp]
     \centering
-    \begin{subfigure}[b]{0.8\textwidth}
+    \begin{subfigure}[b]{0.45\textwidth}
         \centering
-        \includegraphics[width=\textwidth, height=6cm, keepaspectratio]{figures/3-2-1.png}
+        \includegraphics[width=\textwidth, height=6cm, keepaspectratio]{figures/3-3-1.png}
         \caption{预测解与精确解对比}
         \label{fig:predicted_vs_exact}
     \end{subfigure}
     \hfill
-    \begin{subfigure}[b]{0.9\textwidth}
+    \begin{subfigure}[b]{0.45\textwidth}
         \centering
-        \includegraphics[width=\textwidth, height=6cm, keepaspectratio]{figures/3-2-2.png}
+        \includegraphics[width=\textwidth, height=6cm, keepaspectratio]{figures/3-3-4.png}
         \caption{绝对误差分布}
         \label{fig:absolute_error}
     \end{subfigure}
     \\
     \begin{subfigure}[b]{0.45\textwidth}
-        \includegraphics[width=\textwidth, height=6cm, keepaspectratio]{figures/3-2-3.png}
-        \caption{初始损失下降（前 50 步）}
+        \includegraphics[width=\textwidth, height=6cm, keepaspectratio]{figures/3-3-2.png}
+        \caption{初始损失下降（前 100 步）}
         \label{fig:initial_loss}
     \end{subfigure}
     \hfill
     \begin{subfigure}[b]{0.45\textwidth}
-        \includegraphics[width=\textwidth, height=6cm, keepaspectratio]{figures/3-2-4.png}
-        \caption{收敛损失（第 50 步之后）}
+        \includegraphics[width=\textwidth, height=6cm, keepaspectratio]{figures/3-3-3.png}
+        \caption{收敛损失（第 100 步之后）}
         \label{fig:convergence_loss}
     \end{subfigure}
-    \caption{训练过程与结果可视化。(a) 预测解与精确解对比，(b) 绝对误差分布，(c) 初始损失下降（前 50 步），(d) 收敛损失（第 50 步之后）。}
+    \caption{训练过程与结果可视化}
     \label{fig:combined}
 \end{figure}
  
-
+\begin{comment}
 \begin{table}[htbp]
     \centering
     \caption{预测解与解析解的部分数据对比}
@@ -365,8 +365,8 @@
     \end{tabular}
 \end{table}
 表显示，当使用更多的块时，深度 Ritz 方法没有给出更准确的近似解。然而，由于方程的复杂性，当块的数量增加到 2 个时，迭代过程中会出现过拟合现象。
+\end{comment}
 
-\newpage
 \subsection*{结果分析}
 
 Deep Ritz 方法在一维问题中表现出色，预测解与解析解高度一致（图 \ref{fig:predicted_vs_exact}），绝对误差保持在 \( 10^{-3} \) 数量级，最大误差 0.006 出现在 \( x \approx 0.5 \) 附近（图 \ref{fig:absolute_error}），显示出较高的精度，但中间区域误差略高可能与网络捕捉高阶导数能力不足有关。训练时间 37.54 秒（图 \ref{fig:predicted_vs_exact}），初期损失从 300 快速下降至 1.78（图 \ref{fig:initial_loss}），后期平滑收敛至 0.96（图 \ref{fig:convergence_loss}），表明其计算效率高且优化稳定。相比传统有限元法，Deep Ritz 无需网格划分即可达到较低误差，计算复杂度集中于初期训练，适合高维问题和复杂几何场景，其灵活性和稳定性（图 \ref{fig:initial_loss} 和 \ref{fig:convergence_loss}）使其在避免维度灾难和处理非规则边界方面具有显著潜力，尽管超参数调优仍需进一步优化以提升适用性。
@@ -375,23 +375,22 @@ Deep Ritz 方法在一维问题中表现出色，预测解与解析解高度一�
     \centering
     \begin{subfigure}[b]{0.45\textwidth}
         \centering
-        \includegraphics[width=\textwidth, height=6cm, keepaspectratio]{figures/3-2-1.png}
-        \caption{深度Ritz法-10000步训练}
-        \label{fig:predicted_vs_exact}
-    \end{subfigure}
-    \hfill
-    \begin{subfigure}[b]{0.45\textwidth}
-        \centering
         \includegraphics[width=\textwidth, height=6cm, keepaspectratio]{figures/3-1-1.png}
         \caption{深度Ritz法-1000步训练}
         \label{fig:absolute_error}
     \end{subfigure}
-  
-    \caption{拟合情况。(a) 深度Ritz法-10000步训练，(b) 深度Ritz法-1000步训练。}
+    \hfill
+    \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+        \includegraphics[width=\textwidth, height=6cm, keepaspectratio]{figures/3-2-1.png}
+        \caption{深度Ritz法-10000步训练}
+        \label{fig:predicted_vs_exact}
+    \end{subfigure}
+    \caption{拟合失败情况}
     \label{fig:combined}
 \end{figure}
 
-深度 Ritz 方法在 1000 步训练时的拟合失败情况显著，如图 3.2(b) 所示，预测解（蓝色曲线）与精确解（橙色曲线）存在明显偏差。这表明模型在有限迭代步数下未能充分收敛，说明训练步数不足以优化网络参数 \(\theta\)，权重未适配短时训练。相比之下，10000 步训练（图 3.2(a)）显示预测解与精确解几乎重合，验证了深度Ritz法迭代次数的重要性。
+深度 Ritz 方法在 1000 步训练时的拟合失败情况显著，如图 3.2(a) 所示，预测解（蓝色曲线）与精确解（橙色曲线）存在明显偏差。这表明模型在有限迭代步数下未能充分收敛，说明训练步数不足以优化网络参数 \(\theta\)，权重未适配短时训练。相比之下，10000 步训练（图 3.2(b)）显示预测解与精确解几乎重合，验证了深度Ritz法迭代次数的重要性。
 \chapter{伽辽金无网格法}
 
 \section{弱形式推导}
@@ -409,7 +408,7 @@ Deep Ritz 方法在一维问题中表现出色，预测解与解析解高度一�
 其中，\( \delta u(0) \)是虚位移,\( \delta u(0) = 0 \)，满足\(Dirichlet \)条件。
 
 \section{无网格离散化}
-\subsection{构造无网格形函数}
+\subsection*{构造无网格形函数}
 再生核近似方法的目标是通过离散点近似连续函数 \( u(x) \)。其连续形式为：
 \begin{equation}
     u^h(x) = \int_{\Omega} \Phi(x - x') u(x') \, d\Omega'
@@ -433,7 +432,7 @@ Deep Ritz 方法在一维问题中表现出色，预测解与解析解高度一�
 \end{equation}
 
 \(\Psi_I(x)\) 是最终的形函数，通过引入多项式基 \(\boldsymbol{p}(x)\) 和校正系数 \(\boldsymbol{b}(x)\) 确保再生多项式特性。\(\boldsymbol{p}(x)\) 通常为线性基（如 \([1, x]^T\)），\(\boldsymbol{b}(x)\) 通过再生条件（如 \(\sum_I \Psi_I(x) = 1\) 和 \(\sum_I \Psi_I(x) x_I = x\)）确定，\(\Delta V_I\) 表示节点 \( x_I \) 的体积权重。
-\subsection{再生条件}
+\subsection*{再生条件}
 要求 \( u^h(x) \) 再生 \( m \) 阶多项式：
 \begin{equation}
     \sum_{I=1}^{N} \Psi_I(x) p_k(x_I) = p_k(x), \quad k = 0, 1, \dots, m
@@ -460,7 +459,7 @@ Deep Ritz 方法在一维问题中表现出色，预测解与解析解高度一�
     \label{eq:correction_coefficient}
 \end{equation}
 
-\subsection{无网格形函数}
+\subsection*{无网格形函数}
 代入 \eqref{eq:shape_function1}：
 \begin{equation}
     \Psi_I(x) = \boldsymbol{p}^T(x_I) \boldsymbol{M}^{-1}(x) \boldsymbol{p}(x) \Phi(x_I - x) \Delta V_I
@@ -489,7 +488,7 @@ Deep Ritz 方法在一维问题中表现出色，预测解与解析解高度一�
 \end{equation}
 
 
-\subsection{位移和应变离散化}
+\subsection*{位移和应变离散化}
 使用再生核近似：
 \begin{equation}
     u^h(x) = \sum_{I=1}^N \Psi_I(x) u_I
@@ -549,7 +548,7 @@ Deep Ritz 方法在一维问题中表现出色，预测解与解析解高度一�
 
 由于无网格形函数通常不具有插值特性,因此需要采用适当的方法施加强制边界条件，拉格朗日乘子法是一种在数值方法中施加约束条件的强大工具，广泛应用于有限元法、无网格法等场景。其核心在于通过构造增广泛函，将原始问题的能量泛函与约束条件结合，确保解同时满足物理方程和附加约束。
 
-\subsection{对原始能量泛函添加约束条件}
+\subsection*{对原始能量泛函添加约束条件}
 
 考虑一般的偏微分方程问题，其弱形式可表示为：
 \begin{equation}
@@ -594,7 +593,7 @@ c_k(u) = q_k, \quad k = 1, 2, \ldots, m.
 \end{equation}
 此形式适用于任意线性约束，不限于特定物理问题或边界条件。
 
-\subsection{离散化}
+\subsection*{离散化}
 
 在数值方法中，解 \( u \) 和试函数 \( v \) 通过形函数离散表示为：
 \begin{equation}
@@ -678,7 +677,6 @@ c_m(\Psi_1) & c_m(\Psi_2) & \cdots & c_m(\Psi_{NP})
 通过在每个单元内应用高斯积分，计算局部贡献并组装到全局矩阵 \( \boldsymbol{K} \) 和向量 \( \boldsymbol{f} \)，最终求解增广系统 \eqref{eq:augmented_system_general}，得到节点解 \( \boldsymbol{d} \) 和拉格朗日乘子 \( \boldsymbol{\lambda} \)。
 
 
-\newpage
 \section{数值结果}
 考虑\eqref{eq:strong_form}两端固定的一维弹性杆问题，即
 \[
@@ -699,7 +697,7 @@ u(x) = \frac{x^2}{2} + \frac{x}{2}
 \end{equation}
 
 采用再生核近似方法（RKPM）进行离散，具体参数如下：
-线性基函数取 \( \boldsymbol{p}(x) = [1, x]^T \)，确保形函数再生 1 阶多项式。节点数为 \( NP = 11 \)，节点均匀分布于 \( [0, 1] \)，即 \( x_I = \{0.0, 0.10,0.20, \ldots, 1.0\} \)。形函数影响域为 \( s = 0.25 \)，为节点间距 \( 0.1 \) 的 2 倍，保证足够覆盖。核函数采用三次样条核函数：
+线性基函数取 \( \boldsymbol{p}(x) = [1, x]^T \)，确保形函数再生 1 阶多项式。节点数为 \( NP = 11 \)，节点均匀分布于 \( [0, 1] \)，即 \( x_I = \{0.0, 0.10,0.20, \ldots, 1.0\} \)。形函数影响域为 \( s = 0.2 \)，为节点间距 \( 0.1 \) 的 2 倍，保证足够覆盖。核函数采用三次样条核函数：
 \begin{equation}
     \Phi(r) = 
     \begin{cases} 
@@ -782,20 +780,17 @@ u(x) = \frac{x^2}{2} + \frac{x}{2}
     \end{bmatrix}
     \label{eq:augmented_system}
 \end{equation}
-其中，\( G_{I1} = \Psi_I(0) \)。
 
-在代码中，采用了 \( n_g = 3 \) 的 3 点高斯积分方法。具体来说，积分点 \( \xi_k \) 取值为 \( \left\{ -\sqrt{\frac{3}{5}}, 0, \sqrt{\frac{3}{5}} \right\} \)，近似值为 \( \{-0.7746, 0, 0.7746\} \)。相应的权重 \( w_k \) 为 \( \left\{ \frac{5}{9}, \frac{8}{9}, \frac{5}{9} \right\} \)，近似值为 \( \{0.5556, 0.8889, 0.5556\} \)。这种高斯积分方法通过选择特定的积分点和权重，确保了数值积分的高精度。
-\newpage
-\begin{figure}[h]
+\begin{figure}[ht] % 使用 [ht] 允许更灵活的浮动位置
     \centering
-    \begin{minipage}{0.55\textwidth} % 调整宽度以避免重叠
+    \begin{minipage}{0.45\textwidth} % 调整为 0.45 以留出间隙
         \centering
-        \includegraphics[scale=0.5]{figures/4-1.png} % 减小缩放比例
+        \includegraphics[scale=0.35]{figures/4-1.png} % 进一步减小缩放比例
         \captionof{figure}{基于伽辽金型无网格方法的一维弹性杆问题数值结果}
         \label{CHGraphsettings_fig1_meshfree}
     \end{minipage}
     \hfill
-    \begin{minipage}{0.40\textwidth} % 调整宽度以避免重叠
+    \begin{minipage}{0.45\textwidth} % 调整为 0.45 以留出间隙
         \centering
         \begin{tabular}{cccc}
             \toprule
@@ -818,7 +813,7 @@ u(x) = \frac{x^2}{2} + \frac{x}{2}
         \label{tab:exact_vs_computed}
     \end{minipage}
 \end{figure}
-图 \ref{CHGraphsettings_fig1_meshfree} 和表 \ref{tab:exact_vs_computed} 展示了伽辽金无网格法（EFG 方法）在相同一维抛物线特性问题上的数值结果，其中解析解为 \( u(x) = 0.5x^2 + 0.5x \)。从图 \ref{CHGraphsettings_fig1_meshfree} 可以看出，EFG 方法在简单一维问题上具有较高的精度。表 \ref{tab:exact_vs_computed} 进一步显示，EFG 方法的绝对误差在 \( x = 0.9 \) 处达到最大值 0.0048854，平均误差约为 0.0013，整体误差保持在 \( 10^{-3} \) 数量级，精度较高。与 Deep Ritz 方法相比，EFG 方法的误差分布较为均匀，EFG 方法的计算效率可能更高，因为其基于离散节点的线性插值，不涉及神经网络的迭代训练，而 Deep Ritz 方法需要 37.54 秒的训练时间（10000 步）。从适用性来看，EFG 方法依赖于节点的均匀分布，适合规则几何问题，但在高维或复杂几何问题中，节点生成和插值计算复杂度会显著增加，而 Deep Ritz 方法通过神经网络逼近解，无需显式网格划分，在高维问题中更具潜力。此外，EFG 方法的误差在边界附近（如 \( x = 0.9 \)）较大，可能与边界条件处理有关，而 Deep Ritz 方法通过惩罚项（penalty=500）更有效地约束了边界条件（\( u(0) = 0, u(1) = 1 \)）。综合来看，EFG 方法在简单问题上计算效率更高，但 Deep Ritz 方法在精度和高维适用性上展现出更大的优势，适合复杂问题场景。  
+图 \ref{CHGraphsettings_fig1_meshfree} 和表 \ref{tab:exact_vs_computed} 展示了伽辽金无网格法（EFG 方法）在相同一维抛物线特性问题上的数值结果，其中解析解为 \( u(x) = 0.5x^2 + 0.5x \)。如图 \ref{CHGraphsettings_fig1_meshfree} 所示，EFG 方法在简单一维问题上具有较高的精度。EFG 方法的绝对误差在 \( x = 0.9 \) 处达到最大值 0.0048854，平均误差约为 0.0013，整体误差保持在 \( 10^{-3} \) 数量级，精度较高。与 Deep Ritz 方法相比，EFG 方法的误差分布较为均匀。但EFG 方法的误差在边界附近（如 \( x = 0.9 \)）较大，而Deep Ritz 方法通过惩罚项（penalty=500）能更有效地约束了边界条件（\( u(0) = 0, u(1) = 1 \)）。 
 
 \chapter{再生核近似增强深度Ritz方法}
 
@@ -905,227 +900,267 @@ u_\theta(x) = NN([x, \Psi(x)]; \theta),
 5. 优化：通过反向传播更新 \(\theta\)，重复直到收敛。
 
 \section{数值结果}
-设真解 \(u \in H^2(\Omega)\)，存在 \(\theta\) 使得：
+考虑\eqref{eq:strong_form}两端固定的一维弹性杆问题，即
 \[
-\|u - u_\theta\|_{H^1} \leq C_1 h + C_2 \epsilon_{\text{NN}},
+    \left\{
+    \begin{array}{ll}
+        \nabla^2 u - q = 0 & \mathrm{in~} (0, l) \\
+        u(0) =u(1)= 0 
+    \end{array}
+    \right.
+    \label{eq:strong_form1}
 \]
-其中 \(h\) 是节点间距，\(\epsilon_{\text{NN}}\) 是网络逼近误差，\(C_1, C_2\) 是常数。训练稳定性由梯度下降保证：
-\[
-\mathcal{L}(\theta_{k+1}) \leq \mathcal{L}(\theta_k) - \frac{\eta}{2} \|\nabla \mathcal{L}(\theta_k)\|^2, \quad \eta < 2/L。
-\]
-\subsection*{数值结果}
+
+该问题的解析解为：
+\begin{equation}
+u(x) = \frac{x^2}{2} + \frac{x}{2}
+\label{eq:analytical_solution}
+\end{equation}
+
+基于该一维问题构建一个深度神经网络，其中输入和输出维度分别为 1，网络包含宽度为 50 且深度为 1（总层数为 3）的全连接层，采用 $\tanh$ 激活函数；其次，利用 100 个内部采样点和 2 个边界点构造损失函数，其中体积分损失基于拉普拉斯方程的变分形式 $\int_0^1 \left( \frac{1}{2} |\frac{\partial u}{\partial x}|^2 - f u \right) dx$ 近似计算，边界损失通过惩罚系数 1000 强制满足 Dirichlet 边界条件 $u(0)=0$ 和 $u(1)=1$；然后，引入再生核增强模块，采用 11 个均匀分布的节点（间距 0.1）及支持域大小 0.2 的三次样条核函数，计算形状函数并将其与原始输入拼接，增强网络特征表达；最后，采用 Adam 优化器以初始学习率 0.001 并结合步长为 300、衰减因子 0.3 的 StepLR 调度器，在 10000 步训练中通过批量梯度下降优化损失函数，每 10 步记录一次误差，测试阶段则在 100 个积分点上评估 $L^2$ 和 $H^1$ 误差。
+
+\newpage
+\subsection{对比Deep Ritz方法}
+\subsection*{训练精度对比}
 \begin{figure}[htbp]
     \centering
     \begin{subfigure}[b]{0.45\textwidth}
         \centering
-        \includegraphics[width=\textwidth, height=6cm, keepaspectratio]{figures/3-1-1.png}
-        \caption{深度Ritz法1000步拟合结果}
+        \includegraphics[width=\textwidth, height=6cm, keepaspectratio]{figures/3-1-4.png}
+        \caption{深度Ritz法1000步绝对误差}
         \label{fig:deepritz_solutions}
     \end{subfigure}
     \hfill
     \begin{subfigure}[b]{0.45\textwidth}
         \centering
-        \includegraphics[width=\textwidth, height=6cm, keepaspectratio]{figures/5-1-1.png}
-        \caption{再生核增强深度Ritz法1000步拟合结果}
+        \includegraphics[width=\textwidth, height=6cm, keepaspectratio]{figures/5-1-2.png}
+        \caption{再生核增强深度Ritz法绝对误差}
         \label{fig:absolute_error}
     \end{subfigure}
     \\
     \begin{subfigure}[b]{0.45\textwidth}
         \centering
-        \includegraphics[width=\textwidth, height=6cm, keepaspectratio]{figures/3-2-1.png}
-        \caption{深度Ritz法10000步拟合结果}
+        \includegraphics[width=\textwidth, height=6cm, keepaspectratio]{figures/3-1-5.png}
+        \caption{深度Ritz法1000步H1误差}
         \label{fig:deepritz_solutions}
     \end{subfigure}
     \hfill
     \begin{subfigure}[b]{0.45\textwidth}
         \centering
-        \includegraphics[width=\textwidth, height=6cm, keepaspectratio]{figures/5-2-1.png}
-        \caption{再生核增强深度Ritz法10000步拟合结果}
+        \includegraphics[width=\textwidth, height=6cm, keepaspectratio]{figures/5-1-5.png}
+        \caption{再生核增强深度Ritz法1000步H1误差}
         \label{fig:absolute_error}
     \end{subfigure}
-    \begin{comment}
-    \\
+    \centering
+    \caption{1000步误差可视化。}
+    \label{fig:combined}
+\end{figure}
 
+1000 步训练后深度 Ritz 方法的 L2 误差为 0.11，解的整体逼近精度较低。绝对误差分布呈现对称抛物线形状，误差集中在 \( x = 0.2 \) 到 \( x = 0.8 \) 的区域。相比之下，增强深度 Ritz 方法将 L2 误差降低至 0.002。绝对误差分布峰值更小，变化平滑，表明引入 EFG 形状函数显著提升了局部逼近能力。
+
+1000步训练后深度 Ritz 方法的梯度误差（红色曲线）远高于函数值误差（蓝色曲线），表明模型在捕捉解的导数方面表现较差。再生核增强后 H1 误差显著降低。尽管梯度误差仍高于函数值误差，但其幅度大幅减小，表明 EFG 提升了模型对解导数的逼近能力。
+
+\newpage
+\begin{figure}[htbp]
+    \centering
     \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+        \includegraphics[width=\textwidth, height=6cm, keepaspectratio]{figures/3-2-4.png}
+        \caption{深度Ritz法10000步L2误差}
+        \label{fig:deepritz_solutions}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+        \includegraphics[width=\textwidth, height=6cm, keepaspectratio]{figures/5-2-2.png}
+        \caption{再生核增强10000步L2误差}
+        \label{fig:absolute_error}
+    \end{subfigure}
+    \\
+    \begin{subfigure}[b]{0.45\textwidth}
+        \centering
         \includegraphics[width=\textwidth, height=6cm, keepaspectratio]{figures/3-2-5.png}
-        \caption{前1000步损失下降曲线（深度Ritz法）}
-        \label{fig:initial_loss}
+        \caption{深度Ritz法10000步H1误差}
+        \label{fig:deepritz_solutions}
     \end{subfigure}
     \hfill
     \begin{subfigure}[b]{0.45\textwidth}
-        \includegraphics[width=\textwidth, height=6cm, keepaspectratio]{figures/5-1-4.png}
-        \caption{前1000步损失下降曲线（再生核增强）}
-        \label{fig:convergence_loss}
+        \centering
+        \includegraphics[width=\textwidth, height=6cm, keepaspectratio]{figures/5-2-5.png}
+        \caption{再生核增强10000步H1误差}
+        \label{fig:absolute_error}
     \end{subfigure}
-    \\
-    \begin{subfigure}[b]{0.45\textwidth}
-        \includegraphics[width=\textwidth, height=6cm, keepaspectratio]{figures/3-2-4.png}
-        \caption{前10000步损失下降曲线（深度Ritz法）}
-        \label{fig:initial_loss}
-    \end{subfigure}
-    \hfill
-    \begin{subfigure}[b]{0.45\textwidth}
-        \includegraphics[width=\textwidth, height=6cm, keepaspectratio]{figures/5-2-4.png}
-        \caption{前10000步损失下降曲线（再生核增强）}
-        \label{fig:convergence_loss}
-    \end{subfigure}
-    \end{comment}
     \centering
-    \caption{训练结果可视化。}
+    \caption{10000步误差可视化}
     \label{fig:combined}
 \end{figure}
-图 5.1 展示了深度 Ritz 方法和再生核增强深度 Ritz 方法在不同训练步数下的预测解与精确解的对比结果。在图 5.1(a) 中，深度 Ritz 方法在 1000 步训练（width=50, depth=1, penalty=500, trainTime=3.61s）后，模型在有限步数下未能充分收敛。图 5.1(b) 展示的再生核增强深度 Ritz 方法在相同 1000 步训练下，预测解与精确解的偏差明显减小，曲线更贴近精确解，表明增强方法通过引入 MLS 形函数提升了局部拟合能力。
 
-图 5.1(c) 和 5.1(d) 进一步对比了两者在 10000 步训练时的表现。在图 5.1(c) 中，深度 Ritz 方法（width=50, depth=1, penalty=500, trainTime=37.75s）经过 10000 步训练后，预测解与精确解几乎完全重合，拟合效果显著提升，表明增加训练步数有助于优化网络参数 \(\theta\)，使其更好地逼近精确解 \(u(x) = \frac{1}{2}x^2 + \frac{1}{2}x\)。
+10000 步训练后，DeepRitz 方法的 L2 误差和 H1 误差分别为 0.016862 和 0.080057，相较 1000 步（0.25 和 0.5）分别降低约 93\% 和 84\%，但中间区域 L2 误差较大，边界处导数误差显著；EFG-DeepRitz 方法的 L2 误差和 H1 误差为 0.002457 和 0.049370，相较 1000 步（0.1 和 0.2）分别降低约 97\% 和 75\%，误差分布波动较多但整体更低，优于 DeepRitz。
 \newpage
+\subsection*{误差收敛效果}
+
 \begin{figure}[htbp]
     \centering
-
     \begin{subfigure}[b]{0.45\textwidth}
-        \includegraphics[width=\textwidth, height=6cm, keepaspectratio]{figures/3-1-3.png}
-        \caption{前1000步损失下降曲线（深度Ritz法）}
-        \label{fig:initial_loss}
+        \centering
+        \includegraphics[width=\textwidth, height=6cm, keepaspectratio]{figures/3-1-6.png}
+        \caption{深度Ritz法1000步误差收敛曲线}
+        \label{fig:deepritz_solutions}
     \end{subfigure}
     \hfill
     \begin{subfigure}[b]{0.45\textwidth}
-        \includegraphics[width=\textwidth, height=6cm, keepaspectratio]{figures/5-1-4.png}
-        \caption{前1000步损失下降曲线（再生核增强）}
-        \label{fig:convergence_loss}
+        \centering
+        \includegraphics[width=\textwidth, height=6cm, keepaspectratio]{figures/5-1-6.png}
+        \caption{再生核增强1000步误差收敛曲线}
+        \label{fig:absolute_error}
     \end{subfigure}
-    \\
-    \begin{subfigure}[b]{0.45\textwidth}
-        \includegraphics[width=\textwidth, height=6cm, keepaspectratio]{figures/3-2-4.png}
-        \caption{前10000步损失下降曲线（深度Ritz法）}
-        \label{fig:initial_loss}
-    \end{subfigure}
-    \hfill
-    \begin{subfigure}[b]{0.45\textwidth}
-        \includegraphics[width=\textwidth, height=6cm, keepaspectratio]{figures/5-2-4.png}
-        \caption{前10000步损失下降曲线（再生核增强）}
-        \label{fig:convergence_loss}
-    \end{subfigure}
-    
+   
     \centering
-    \caption{训练过程可视化。}
+    \caption{1000步误差收敛可视化}
     \label{fig:combined}
 \end{figure}
 
-图 5.2(a) 说明深度 Ritz 方法初始损失约为 \(1.06\)，随着步数增加逐渐下降至约 \(1.046\)，损失函数下降较慢，且存在局部波动。相比之下，展示的再生核增强深度 Ritz 方法在相同 1000 步训练后，损失从初始值迅速下降至约 \(0.958\)，曲线更加平滑，表明再生核增强了模型的稳定性，损失函数平滑且迅速收敛。
+DeepRitz 方法初始 L2 误差和 H1 误差较高（2.0 和 1.75），前 200 步下降至 0.5 和 0.75，最终稳定在 0.25 和 0.5，但存在波动且导数拟合较弱；EFG-DeepRitz 方法初始误差较低（1.4-1.6），收敛更快，最终误差降至 0.1 和 0.2，训练更稳定，H1 误差与 L2 误差差距较小，显示出再生核增强对函数值和导数拟合的显著改进。
 
-图 5.2(c) 给出了深度 Ritz 方法在 10000 步训练后的损失收敛情况，初始损失约为 \(1.03\)，在早期快速下降后趋于平稳，最终稳定在约 \(0.99\) 附近，显示出较好的收敛性。图 5.2(d) 呈现了再生核增强深度 Ritz 方法在 10000 步训练后的损失变化，初始损失约为 \(0.962\)，随后快速下降并稳定在约 \(0.958\) 左右，曲线几乎无波动，表明增强方法在长期训练中表现出更高的稳定性和收敛效率。
+\begin{figure}[htbp]
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+        \includegraphics[width=\textwidth, height=6cm, keepaspectratio]{figures/3-2-6.png}
+        \caption{深度Ritz法10000步误差收敛曲线}
+        \label{fig:deepritz_solutions}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+        \includegraphics[width=\textwidth, height=6cm, keepaspectratio]{figures/5-2-6.png}
+        \caption{再生核增强10000步误差收敛曲线}
+        \label{fig:absolute_error}
+    \end{subfigure}
+   
+    \centering
+    \caption{10000步误差收敛可视化}
+    \label{fig:combined}
+\end{figure}
+10000 步训练后，DeepRitz 方法的 L2 误差和 H1 误差分别从 1.2 和 1.0 收敛至 0.05 和 0.2，相较 1000 步（0.25 和 0.5）降低了约 80\% 和 60\%，但导数拟合仍是瓶颈；EFG-DeepRitz 方法的 L2 误差和 H1 误差从 1.0 和 0.8 收敛至 0.02 和 0.1，相较 1000 步（0.1 和 0.2）降低了约 80\% 和 50\%，收敛更快且精度更高。EFG 增强显著改善了初始逼近和最终误差，建议优化 EFG 参数和调整惩罚项以进一步提升导数拟合。
 
-通过对比分析，两种方法在 1000 步训练时的损失值均较高，深度 Ritz 方法的损失 (\(1.046\)) 显著高于再生核增强方法 (\(0.958\))，这反映了增强方法在短时训练中通过局部几何信息的引入获得了更好的初始拟合能力。然而，两种方法在 10000 步训练后均趋于收敛，增强方法的最终损失 (\(0.958\)) 略低于深度 Ritz 方法 (\(0.99\))，表明其在长期训练中仍保持轻微优势，尤其是在损失的稳定性上更为突出。
-\chapter{图表设置}
-\subsection*{单张}
-\begin{figure}[H]
+\subsection{计算时间对比}
+\begin{figure}[ht]
     \centering
-    \includegraphics[scale=0.4]{figures/1.png}
-    \caption{\centering{边界点处无网格形函数}}
-    \label{CHGraphsettings_fig1_meshfree1}
-\end{figure}
-单张图片Latex代码
-\begin{lstlisting}
-\begin{figure}[H]-放置位置
-\centering-居中
-\includegraphics[scale=0.4]{figures/1.png}-大小、图片路径
-\caption{\centering{边界点处无网格形函数}}-图名
-\label{CHGraphsettings_fig1_meshfree1}-命名
-\end{figure}
-\end{lstlisting}
-\newpage
-\subsection*{并排}
-\begin{figure}[H]
-    \centering
-    \begin{subcaptiongroup}
-    \includegraphics[width=0.49\textwidth]{figures/1.png}
-    \phantomcaption\label{1}
-    \includegraphics[width=0.49\textwidth]{figures/2.png}
-    \phantomcaption\label{2}
-    \end{subcaptiongroup}
-\caption{\centering{无网格形函数：\subref{1}边界点；\subref{2}中心点}}
-% NOTE:遇到图名过长需要换行的编写：
-% \caption{\centering{标题：\protect\linebreak \subref{xxx} 小标题1；\subref{xx} 小标题2；\subref{xxx}小标题3；\subref{xxx} 小标题4}}
-\label{CHGraphsettings_fig2_meshfree}
-\end{figure}
-并排图片Latex代码
-\begin{lstlisting}
-\begin{figure}[H]
-\centering
-\begin{subcaptiongroup}
-\includegraphics[width=0.49\textwidth]{figure/1.png}
-\phantomcaption\label{1}
-\includegraphics[width=0.49\textwidth]{figure/2.png}
-\phantomcaption\label{2}
-\end{subcaptiongroup}
-\caption{\centering{无网格形函数：\subref{1}边界点；\subref{2}中心点}}
-\end{lstlisting}
-\newpage
-\subsection*{表格式图片}
-\begin{figure}[H]
-    \centering
-    \begin{tabular}{cccc}
-    $\quad$&$p=2$&$p=2$&$p=2$\\
-    边界点&\begin{subcaptiongroup}\raisebox{-0.5\height}{\includegraphics[width=0.3\textwidth]{figures/1.png}}\end{subcaptiongroup}
-    &\begin{subcaptiongroup}\raisebox{-0.5\height}{\includegraphics[width=0.3\textwidth]{figures/1.png}}\end{subcaptiongroup}
-    &\begin{subcaptiongroup}\raisebox{-0.5\height}{\includegraphics[width=0.3\textwidth]{figures/1.png}}\end{subcaptiongroup}\\
-    中心点&\begin{subcaptiongroup}\raisebox{-0.5\height}{\includegraphics[width=0.3\textwidth]{figures/2.png}}\end{subcaptiongroup}
-    &\begin{subcaptiongroup}\raisebox{-0.5\height}{\includegraphics[width=0.3\textwidth]{figures/2.png}}\end{subcaptiongroup}
-    &\begin{subcaptiongroup}\raisebox{-0.5\height}{\includegraphics[width=0.3\textwidth]{figures/2.png}}\end{subcaptiongroup}\\
-    \end{tabular}
-    \caption{\textbf{二维边界点与内部节点无网格形函数图}}\label{CHGraphsettings_fig3_meshfree}
+    \begin{tikzpicture}
+    \begin{axis}[
+        title={训练时间对比},
+        ybar,
+        bar width=0.2cm, % 减小柱宽，避免柱重叠
+        enlargelimits=0.2, % 增加柱间距
+        legend style={at={(0.5,-0.2)}, anchor=north,legend columns=-1}, % 图例放置在下方
+        ylabel={训练时间 (秒)},
+        symbolic x coords={1000 步, 10000 步, 20000 步},
+        xtick=data,
+        ymin=0, ymax=300, % 调整 y 轴范围
+        nodes near coords, % 显示柱顶数值
+        nodes near coords align={vertical},
+        every node near coord/.append style={font=\scriptsize, xshift=0pt, yshift=2pt}, % 调整字体大小和位置
+        width=6cm, % 缩小图表宽度
+        height=6cm
+    ]
+    \addplot[fill=blue!50] coordinates {(1000 步, 23.95) (10000 步, 34.79) };
+    \addplot[fill=green!50] coordinates {(1000 步, 3.36) (10000 步, 244.76) };
+    \legend{DeepRitz 方法, EFG-DeepRitz 方法}
+    \end{axis}
+    \end{tikzpicture}
+\begin{comment}
+    \quad % 控制两图间距
+    \begin{tikzpicture}
+    \begin{axis}[
+        title={计算时间对比},
+        ybar,
+        bar width=0.2cm, % 减小柱宽
+        enlargelimits=0.2, % 增加柱间距
+        legend style={at={(0.5,-0.2)}, anchor=north,legend columns=-1}, % 图例放置在下方
+        ylabel={计算时间 (秒)},
+        symbolic x coords={1000 步, 10000 步, 20000 步, 伽辽金无网格},
+        xtick=data,
+        ymin=0, ymax=0.35, % 调整 y 轴范围
+        nodes near coords, % 显示柱顶数值
+        nodes near coords align={vertical},
+        every node near coord/.append style={font=\scriptsize, xshift=0pt, yshift=2pt}, % 调整字体大小和位置
+        width=8cm, % 调整图表宽度
+        height=6cm
+    ]
+    \addplot[fill=blue!50] coordinates {(1000 步, 0.001) (10000 步, 0.0015) (20000 步, 0.0020) (伽辽金无网格, 0)};
+    \addplot[fill=green!50] coordinates {(1000 步, 0.01) (10000 步, 0.01) (20000 步, 0) (伽辽金无网格, 0)};
+    \addplot[fill=red!50] coordinates {(1000 步, 0) (10000 步, 0) (20000 步, 0) (伽辽金无网格, 0.3)};
+    \legend{DeepRitz 方法, EFG-DeepRitz 方法, 伽辽金无网格方法}
+    \end{axis}
+    \end{tikzpicture}
+    \end{comment}
+    \caption{训练时间对比}
+
+    \label{fig:time_comparison}
     \end{figure}
+    
+    从图 \ref{fig:time_comparison} 可以看出，DeepRitz 方法的训练时间随步数增加显著增长（1000 步 23.95 秒，10000 步 34.79 秒，20000 步 70.88 秒），而 EFG-DeepRitz 方法训练时间更长（1000 步 3.36 秒，10000 步 244.76 秒），反映了再生核增强引入的额外计算开销。计算时间方面，DeepRitz 方法（0.001 秒至 0.002 秒）和 EFG-DeepRitz 方法（0.01 秒）均远低于伽辽金无网格方法（0.3 秒），表明深度学习方法在推理阶段的高效性。综合来看，EFG-DeepRitz 方法虽然训练时间较长，但计算时间仍具优势，适合需要快速推理的应用场景。
 
-表格式图片Latex代码
-\begin{lstlisting}
-\begin{figure}[H]
-\centering
-\begin{tabular}{cccc}
-$\quad$&$p=2$&$p=2$&$p=2$\\
-边界点&\begin{subcaptiongroup}\raisebox{-0.5\height}{\includegraphics[width=0.3\textwidth]{figure/1.png}}\end{subcaptiongroup}
-&\begin{subcaptiongroup}\raisebox{-0.5\height}{\includegraphics[width=0.3\textwidth]{figure/1.png}}\end{subcaptiongroup}
-&\begin{subcaptiongroup}\raisebox{-0.5\height}{\includegraphics[width=0.3\textwidth]{figure/1.png}}\end{subcaptiongroup}\\
-中心点&\begin{subcaptiongroup}\raisebox{-0.5\height}{\includegraphics[width=0.3\textwidth]{figure/2.png}}\end{subcaptiongroup}
-&\begin{subcaptiongroup}\raisebox{-0.5\height}{\includegraphics[width=0.3\textwidth]{figure/2.png}}\end{subcaptiongroup}
-&\begin{subcaptiongroup}\raisebox{-0.5\height}{\includegraphics[width=0.3\textwidth]{figure/2.png}}\end{subcaptiongroup}\\
-\end{tabular}
-\caption{\textbf{二维边界点与内部节点无网格形函数图}}\label{CHGraphsettings_fig3_meshfree}
-\end{figure}     
-\end{lstlisting}
+\newpage
+\subsection{对比RKPM方法}
 
-\subsection*{三线表}
-\begin{table}[H]
-    \caption{\textbf{三次基函数无网格法分片实验结果}}
-    \centering\label{CHGraphsettings_table_cubic}
-    \begin{tabular}{lcccc}
-       \toprule
-    & \multicolumn{2}{c}{二次分片实验} & \multicolumn{2}{c}{三次分片实验} \\ \cline{2-5}
-       &$L_2$-Error$\quad$&$H_1$-Error&$L_2$-Error$\quad$&$H_1$-Error\\
-       \midrule
-      RKGSI-Penalty&$1.4\times10^{-7}$&$2.1\times10^{-6}$&$2.0\times10^{-7}$&$2.7\times10^{-6}$\\
-      RKGSI-LM&$3.0\times10^{-4}$&$9.8\times10^{-3}$&$4.2\times10^{-4}$&$9.8\times10^{-3}$\\
-      RKGSI-Nitsche&$3.6\times10^{-15}$&$1.0\times10^{-13}$&$4.6\times10^{-15}$&$9.5\times10^{-14}$\\
-      RKGSI-HR&$3.1\times10^{-15}$&$1.0\times10^{-13}$&$3.5\times10^{-15}$&$7.4\times10^{-14}$\\
-       \bottomrule
-    \end{tabular}
-    \end{table}
-三线表Latex代码
-\begin{lstlisting}
-\begin{table}[H]
-\caption{\textbf{三次基函数无网格法分片实验结果}}
-\centering\label{CHGraphsettings_table_cubic}
-\begin{tabular}{lcccc}
-\toprule
-& \multicolumn{2}{c}{二次分片实验} & \multicolumn{2}{c}{三次分片实验} \\ \cline{2-5}
-&$L_2$-Error$\quad$&$H_1$-Error&$L_2$-Error$\quad$&$H_1$-Error\\
-\midrule
-RKGSI-Penalty&$1.4\times10^{-7}$&$2.1\times10^{-6}$&$2.0\times10^{-7}$&$2.7\times10^{-6}$\\
-RKGSI-LM&$3.0\times10^{-4}$&$9.8\times10^{-3}$&$4.2\times10^{-4}$&$9.8\times10^{-3}$\\
-RKGSI-Nitsche&$3.6\times10^{-15}$&$1.0\times10^{-13}$&$4.6\times10^{-15}$&$9.5\times10^{-14}$\\
-RKGSI-HR&$3.1\times10^{-15}$&$1.0\times10^{-13}$&$3.5\times10^{-15}$&$7.4\times10^{-14}$\\
-\bottomrule
-\end{tabular}
-\end{table}    
-\end{lstlisting}
+\subsection*{训练精度对比}
+\begin{figure}[htbp]
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+        \includegraphics[width=\textwidth, height=6cm, keepaspectratio]{figures/4-2.png}
+        \caption{RKPM方法绝对误差}
+        \label{fig:deepritz_solutions}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+        \includegraphics[width=\textwidth, height=6cm, keepaspectratio]{figures/5-1-2.png}
+        \caption{再生核增强10000步绝对误差}
+        \label{fig:absolute_error}
+    \end{subfigure}
+
+    \centering
+    \caption{误差可视化。}
+    \label{fig:combined}
+\end{figure}
+
+\begin{figure}[htbp]
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+        \includegraphics[width=\textwidth, height=6cm, keepaspectratio]{figures/4-3.png}
+        \caption{RKPM方法L2误差}
+        \label{fig:deepritz_solutions}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+        \includegraphics[width=\textwidth, height=6cm, keepaspectratio]{figures/5-1-5.png}
+        \caption{再生核增强10000步L2误差}
+        \label{fig:absolute_error}
+    \end{subfigure}
+
+    \centering
+    \caption{L2误差对比}
+    \label{fig:combined}
+\end{figure}
+RKPM 方法的 L2 误差和 H1 误差分别为 0.011709 和 0.043137，误差分布平滑但边界处导数误差较大；EFG-DeepRitz 方法的 L2 误差为 0.002368（比 RKPM 低约 80\%），H1 误差为 0.058213（高约 35\%），L2 误差分布波动较大但精度更高，导数误差波动性强。EFG-DeepRitz 结合深度学习显著提升了 L2 误差的拟合能力，但导数拟合较弱.
+
+\chapter{结论}
+本文提出的再生核增强深度 Ritz 法（EFG-DeepRitz）融合深度学习与无网格方法，基于 Ritz 变分原理，通过再生核增强提升偏微分方程求解的精度与效率。方法在深度神经网络框架下引入再生核近似，针对一维问题实现显著的 $L^2$ 误差降低，展现出较高的推理效率与应用潜力。
+
+实现过程如下：首先，深度 Ritz 方法以一维拉压杆模型为基础，传统 Ritz 方法通过预定义基函数近似位移场，而深度 Ritz 方法利用神经网络替代基函数，验证了其数值有效性。其次，伽辽金无网格法（RKPM）从弱形式出发，通过无网格离散化构造形状函数，结合拉格朗日乘子法强制边界条件并采用高斯积分法近似积分，显示出较好的导数拟合能力。最后，本文主要实现再生核近似增强深度 Ritz 法，通过再生核近似机制增强局部解表达能力，验证了方法的优越性。
+
+算例验证以一维泊松方程为例，EFG-DeepRitz 方法在 10000 步训练后 $L^2$ 误差 0.002368 优于 RKPM（0.011709）和 DeepRitz（0.016862），$H^1$ 误差 0.058213 虽高于 RKPM（0.043137）但低于 DeepRitz（0.080057），误差分布显示其在中间区域精度更高，但导数误差波动较大，边界处需进一步优化。训练时间 244.76 秒长于 DeepRitz（34.79 秒）和 RKPM（无训练时间），但计算时间 0.01 秒远低于 RKPM（0.3031 秒），验证了方法在推理效率上的优势，为复杂偏微分方程求解提供了新颖且高效的数值工具。
+增强深度 Ritz 方法通过引入 EFG 形状函数，增强了模型的表达能力，尤其在局部区域的逼近精度上表现优异。较低的 L2 和 H1 误差表明该方法更适合处理具有复杂梯度变化的偏微分方程问题。
+
+尽管增强方法性能优于原始深度 Ritz 方法，但 H1 误差中的梯度误差仍较高。这可能是由于网络深度或宽度不足，或训练步数有限（1000 步可能不足以充分收敛）。建议增加训练步数（例如到 5000 或 10000 步）或调整超参数（如学习率、惩罚系数）以进一步优化梯度逼近。
+
+
+
 
 \chapter{使用Zotero管理参考文献}
 1.下载附件：Better BibTex
@@ -1153,81 +1188,13 @@ Latex代码
 eg：基于赫林格-赖斯纳原理的变分一致型伽辽金无网格法\cite{Wu2022,wu2023}相较于传统的本质边界条件施加方法能够有效提高计算精度和计算效率。
 \end{lstlisting}
 
-\chapter{\LaTeX 部分所需包介绍}
 
-
-编写公式-\{amsmath,amsfonts,amssymb,textcomp,ulem\}
-
-绘制表格-\{booktabs,multirow,tabularx,float\}
-
-书写代码-\{listings\}
-
-代码块设置
-\begin{lstlisting}
-\lstset{breaklines,        %自动换行
-        columns=flexible,  %不随便添加空格,只在已经有空格的地方添加空格,
-       }
-\end{lstlisting}
-
-设置PDF文档中超链接的颜色
-\begin{lstlisting}
-\hypersetup{colorlinks=true,linkcolor=black,citecolor=black}
-\end{lstlisting}
 
 
 
 % NOTE 毕业论文致谢部分
 % \include{acknowledgments}
-\appendix
-\chapter{附录}
-附录章节前需添加以下下代码
-\begin{lstlisting}
-    \appendix
-\end{lstlisting}
 
-
-\chapter{参考格式}
-\begin{lstlisting}
-
-\documentclass[engineeringmaster]{hquThesis}-hquThesis是模板文件,包含文本格式,字体设置,文献格式.....
-\usepackage{amsmath,amsfonts,amssymb,textcomp}-公式所需
-\usepackage{booktabs,multirow,tabularx,float}-表格所需
-\hypersetup{colorlinks=true,linkcolor=black,citecolor=black}-设置超链接格式
-\titleZh{XXX}-中文标题
-\titleEn{XXX}-英文标题
-\id{}-学号
-\authorZh{XXX}-作者姓名
-\supervisorZh{XXX}{XXX}-指导教师+职称
-\cosupervisorZh{XXX}{XXX}-合作教师+职称
-\practicevisorZh{XXX}{XXX}-实践教师+职称
-\departmentZh{土木工程学院}
-\fieldZh{结构体系创新与工程应用}
-\majortype{工程硕士}
-\major{土木水利}
-\coverdate{二〇二四年三月XX日}
--封面设置
-\begin{document}-正文开始
-
-\makecover
-\include{decision}-答辩委员会
-\include{declaration}-独创性说明
-\frontmatter
-\include{abstract}-摘要
-\tableofcontents
-\mainmatter
-\include{Introduction}-正文章节
-\include{XXX}
-\include{XXXX}
-\backmatter-页眉另起设置
-\bibliography{references}-引用参考文献条目(.bib)
-\include{acknowledgments}-致谢
-\appendix-附录部分
-\include{appendixA}-附录章节
-\include{appendixB}-附录章节
-\include{cv}-个人简历
-
-\end{document}-结束正文
-\end{lstlisting}
 
 
 \backmatter
