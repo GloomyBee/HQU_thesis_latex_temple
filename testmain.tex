@@ -285,7 +285,7 @@
 
 本章构建的神经网络基于一个简单的多层感知机结构，具有一个输入层、一个隐藏层和一个输出层，分别对应 1 维输入和 1 维输出，隐藏层的宽度 \( m \) 为 50。本次用于近似一维微分方程的网络是由一个块（两个全连接层）、一个输入层和一个输出层组成的。
 
-边界条件会导致一些问题，通过在损失函数中加入边界条件的残差项，强制网络解在边界处逼近给定值，作为惩罚项来间接强制网络满足边界条件。本章边界损失通过 500 倍的惩罚系数来增强。
+边界条件会导致一些问题，通过在损失函数中加入边界条件的残差项，强制网络解在边界处逼近给定值，作为惩罚项来间接强制网络满足边界条件。本章边界损失通过 1000 倍的惩罚系数来增强。
 
 对应于体积分损失，通过蒙特卡洛方法（随机采样点）近似积分：
 \begin{equation}
@@ -299,11 +299,11 @@
     \end{equation}
 总损失为：
 \begin{equation}
-    L = L_{\text{vol}} + 500 \cdot L_{\text{bdy}}
+    L = L_{\text{vol}} + 1000 \cdot L_{\text{bdy}}
     \label{eq:total_loss}
     \end{equation}
 
-训练策略包括 10000 次迭代的梯度下降，使用 Adam 优化器，初始学习率为 0.001，并通过 StepLR 调度器以每 5000 步减少至原来的 30\% 来优化学习率。
+对该问题采用20000 次迭代的梯度下降，使用 Adam 优化器，初始学习率为 0.001，并通过 StepLR 调度器以每 5000 步减少至原来的 30\% 来优化学习率。
 
 为了更定量地分析误差，考虑解析解，用均方误差来近似误差：
 \begin{equation}
@@ -311,7 +311,7 @@
     \label{eq:error}
     \end{equation}
 计算误差如下：
-
+\begin{comment}
 \begin{figure}[htbp]
     \centering
     \begin{subfigure}[b]{0.45\textwidth}
@@ -342,7 +342,26 @@
     \caption{训练过程与结果可视化}
     \label{fig:combined}
 \end{figure}
- 
+\end{comment}
+\begin{figure}[htbp]
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+        \includegraphics[width=\textwidth, height=6cm, keepaspectratio]{figures/3-3-4.png}
+        \caption{绝对误差分布}
+        \label{fig:absolute_error1}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.45\textwidth}
+        \includegraphics[width=\textwidth, height=6cm, keepaspectratio]{figures/3-3-3.png}
+        \caption{收敛损失（第 100 步之后）}
+        \label{fig:convergence_loss}
+    \end{subfigure}
+    \caption{训练过程与结果可视化}
+    \label{fig:combined}
+\end{figure}
+
+
 \begin{comment}
 \begin{table}[htbp]
     \centering
@@ -369,7 +388,7 @@
 
 \subsection*{结果分析}
 
-Deep Ritz 方法在一维问题中表现出色，预测解与解析解高度一致（图 \ref{fig:predicted_vs_exact}），绝对误差保持在 \( 10^{-3} \) 数量级，最大误差 0.006 出现在 \( x \approx 0.5 \) 附近（图 \ref{fig:absolute_error}），显示出较高的精度，但中间区域误差略高可能与网络捕捉高阶导数能力不足有关。训练时间 37.54 秒（图 \ref{fig:predicted_vs_exact}），初期损失从 300 快速下降至 1.78（图 \ref{fig:initial_loss}），后期平滑收敛至 0.96（图 \ref{fig:convergence_loss}），表明其计算效率高且优化稳定。相比传统有限元法，Deep Ritz 无需网格划分即可达到较低误差，计算复杂度集中于初期训练，适合高维问题和复杂几何场景，其灵活性和稳定性（图 \ref{fig:initial_loss} 和 \ref{fig:convergence_loss}）使其在避免维度灾难和处理非规则边界方面具有显著潜力，尽管超参数调优仍需进一步优化以提升适用性。
+Deep Ritz 方法在一维问题中表现出色，绝对误差保持在 \( 10^{-3} \) 数量级，最大误差 0.008 出现在 \( x \approx 0.8 \) 附近（图 \ref{fig:absolute_error1}），显示出较高的精度，但中间区域误差略高可能与网络捕捉高阶导数能力不足有关。初期损失从 300 快速下降至 1.78，后期平滑收敛至 0.96（图 \ref{fig:convergence_loss}），表明其计算效率高且优化稳定。相比传统有限元法，Deep Ritz 无需网格划分即可达到较低误差，计算复杂度集中于初期训练，适合高维问题和复杂几何场景，在避免维度灾难和处理非规则边界方面具有显著潜力.
     
 \begin{figure}[htbp]
     \centering
@@ -377,20 +396,20 @@ Deep Ritz 方法在一维问题中表现出色，预测解与解析解高度一�
         \centering
         \includegraphics[width=\textwidth, height=6cm, keepaspectratio]{figures/3-1-1.png}
         \caption{深度Ritz法-1000步训练}
-        \label{fig:absolute_error}
+        \label{fig:ritz1000}
     \end{subfigure}
     \hfill
     \begin{subfigure}[b]{0.45\textwidth}
         \centering
         \includegraphics[width=\textwidth, height=6cm, keepaspectratio]{figures/3-2-1.png}
         \caption{深度Ritz法-10000步训练}
-        \label{fig:predicted_vs_exact}
+        \label{fig:ritz10000}
     \end{subfigure}
     \caption{拟合失败情况}
     \label{fig:combined}
 \end{figure}
 
-深度 Ritz 方法在 1000 步训练时的拟合失败情况显著，如图 3.2(a) 所示，预测解（蓝色曲线）与精确解（橙色曲线）存在明显偏差。这表明模型在有限迭代步数下未能充分收敛，说明训练步数不足以优化网络参数 \(\theta\)，权重未适配短时训练。相比之下，10000 步训练（图 3.2(b)）显示预测解与精确解几乎重合，验证了深度Ritz法迭代次数的重要性。
+深度 Ritz 方法在 1000 步训练时的拟合失败情况显著，如（图 \ref{fig:ritz1000}）所示，预测解（蓝色曲线）与精确解（橙色曲线）存在明显偏差。这表明模型在有限迭代步数下未能充分收敛，说明训练步数不足以优化网络参数 \(\theta\)，权重未适配短时训练。相比之下，10000 步训练（图 \ref{fig:ritz10000}）显示预测解与精确解几乎重合，验证了深度Ritz法迭代次数的重要性。
 \chapter{伽辽金无网格法}
 
 \section{弱形式推导}
@@ -813,7 +832,7 @@ u(x) = \frac{x^2}{2} + \frac{x}{2}
         \label{tab:exact_vs_computed}
     \end{minipage}
 \end{figure}
-图 \ref{CHGraphsettings_fig1_meshfree} 和表 \ref{tab:exact_vs_computed} 展示了伽辽金无网格法（EFG 方法）在相同一维抛物线特性问题上的数值结果，其中解析解为 \( u(x) = 0.5x^2 + 0.5x \)。如图 \ref{CHGraphsettings_fig1_meshfree} 所示，EFG 方法在简单一维问题上具有较高的精度。EFG 方法的绝对误差在 \( x = 0.9 \) 处达到最大值 0.0048854，平均误差约为 0.0013，整体误差保持在 \( 10^{-3} \) 数量级，精度较高。与 Deep Ritz 方法相比，EFG 方法的误差分布较为均匀。但EFG 方法的误差在边界附近（如 \( x = 0.9 \)）较大，而Deep Ritz 方法通过惩罚项（penalty=500）能更有效地约束了边界条件（\( u(0) = 0, u(1) = 1 \)）。 
+RKPM 方法在简单一维问题上具有较高的精度，绝对误差在 \( x = 0.9 \) 处达到最大值 0.004，平均误差约为 0.001，整体误差保持在 \( 10^{-3} \) 数量级，精度较高。与 Deep Ritz 方法相比 ，RKPM 方法的误差分布较为均匀。但RKPM方法的误差在边界附近（如 \( x = 0.9 \)）较大，而Deep Ritz 方法通过惩罚项能更有效地约束了边界条件。 
 
 \chapter{再生核近似增强深度Ritz方法}
 
@@ -995,8 +1014,8 @@ u(x) = \frac{x^2}{2} + \frac{x}{2}
     \label{fig:combined}
 \end{figure}
 
-10000 步训练后，DeepRitz 方法的 L2 误差和 H1 误差分别为 0.016862 和 0.080057，相较 1000 步（0.25 和 0.5）分别降低约 93\% 和 84\%，但中间区域 L2 误差较大，边界处导数误差显著；EFG-DeepRitz 方法的 L2 误差和 H1 误差为 0.002457 和 0.049370，相较 1000 步（0.1 和 0.2）分别降低约 97\% 和 75\%，误差分布波动较多但整体更低，优于 DeepRitz。
-\newpage
+10000 步训练后，DeepRitz 方法的 L2 误差和 H1 误差分别为 0.016 和 0.080，相较 1000 步（0.25 和 0.5）显著降低，但中间区域 L2 误差较大，边界处导数误差显著；RK-DeepRitz 方法的 L2 误差和 H1 误差为 0.0024 和 0.049，相较 1000 步（0.1 和 0.2）显著降低，误差分布波动较多但整体更低，优于 DeepRitz。
+
 \subsection*{误差收敛效果}
 
 \begin{figure}[htbp]
@@ -1020,7 +1039,7 @@ u(x) = \frac{x^2}{2} + \frac{x}{2}
     \label{fig:combined}
 \end{figure}
 
-DeepRitz 方法初始 L2 误差和 H1 误差较高（2.0 和 1.75），前 200 步下降至 0.5 和 0.75，最终稳定在 0.25 和 0.5，但存在波动且导数拟合较弱；EFG-DeepRitz 方法初始误差较低（1.4-1.6），收敛更快，最终误差降至 0.1 和 0.2，训练更稳定，H1 误差与 L2 误差差距较小，显示出再生核增强对函数值和导数拟合的显著改进。
+DeepRitz 方法初始 L2 误差和 H1 误差较高（2.0 和 1.75），前 200 步下降至 0.5 和 0.75，最终稳定在 0.25 和 0.5，但存在波动且导数拟合较弱；RK-DeepRitz 方法初始误差较低（1.4-1.6），收敛更快，最终误差降至 0.1 和 0.2，训练更稳定，H1 误差与 L2 误差差距较小，显示出再生核增强对函数值和导数拟合的显著改进。
 
 \begin{figure}[htbp]
     \centering
@@ -1042,65 +1061,67 @@ DeepRitz 方法初始 L2 误差和 H1 误差较高（2.0 和 1.75），前 200 �
     \caption{10000步误差收敛可视化}
     \label{fig:combined}
 \end{figure}
-10000 步训练后，DeepRitz 方法的 L2 误差和 H1 误差分别从 1.2 和 1.0 收敛至 0.05 和 0.2，相较 1000 步（0.25 和 0.5）降低了约 80\% 和 60\%，但导数拟合仍是瓶颈；EFG-DeepRitz 方法的 L2 误差和 H1 误差从 1.0 和 0.8 收敛至 0.02 和 0.1，相较 1000 步（0.1 和 0.2）降低了约 80\% 和 50\%，收敛更快且精度更高。EFG 增强显著改善了初始逼近和最终误差，建议优化 EFG 参数和调整惩罚项以进一步提升导数拟合。
-
+DeepRitz 方法经训练后误差显著降低，但导数拟合仍为瓶颈。RK-DeepRitz 方法收敛更快，精度更高。
 \subsection{计算时间对比}
 \begin{figure}[ht]
     \centering
-    \begin{tikzpicture}
-    \begin{axis}[
-        title={训练时间对比},
-        ybar,
-        bar width=0.2cm, % 减小柱宽，避免柱重叠
-        enlargelimits=0.2, % 增加柱间距
-        legend style={at={(0.5,-0.2)}, anchor=north,legend columns=-1}, % 图例放置在下方
-        ylabel={训练时间 (秒)},
-        symbolic x coords={1000 步, 10000 步, 20000 步},
-        xtick=data,
-        ymin=0, ymax=300, % 调整 y 轴范围
-        nodes near coords, % 显示柱顶数值
-        nodes near coords align={vertical},
-        every node near coord/.append style={font=\scriptsize, xshift=0pt, yshift=2pt}, % 调整字体大小和位置
-        width=6cm, % 缩小图表宽度
-        height=6cm
-    ]
-    \addplot[fill=blue!50] coordinates {(1000 步, 23.95) (10000 步, 34.79) };
-    \addplot[fill=green!50] coordinates {(1000 步, 3.36) (10000 步, 244.76) };
-    \legend{DeepRitz 方法, EFG-DeepRitz 方法}
-    \end{axis}
-    \end{tikzpicture}
-\begin{comment}
-    \quad % 控制两图间距
-    \begin{tikzpicture}
-    \begin{axis}[
-        title={计算时间对比},
-        ybar,
-        bar width=0.2cm, % 减小柱宽
-        enlargelimits=0.2, % 增加柱间距
-        legend style={at={(0.5,-0.2)}, anchor=north,legend columns=-1}, % 图例放置在下方
-        ylabel={计算时间 (秒)},
-        symbolic x coords={1000 步, 10000 步, 20000 步, 伽辽金无网格},
-        xtick=data,
-        ymin=0, ymax=0.35, % 调整 y 轴范围
-        nodes near coords, % 显示柱顶数值
-        nodes near coords align={vertical},
-        every node near coord/.append style={font=\scriptsize, xshift=0pt, yshift=2pt}, % 调整字体大小和位置
-        width=8cm, % 调整图表宽度
-        height=6cm
-    ]
-    \addplot[fill=blue!50] coordinates {(1000 步, 0.001) (10000 步, 0.0015) (20000 步, 0.0020) (伽辽金无网格, 0)};
-    \addplot[fill=green!50] coordinates {(1000 步, 0.01) (10000 步, 0.01) (20000 步, 0) (伽辽金无网格, 0)};
-    \addplot[fill=red!50] coordinates {(1000 步, 0) (10000 步, 0) (20000 步, 0) (伽辽金无网格, 0.3)};
-    \legend{DeepRitz 方法, EFG-DeepRitz 方法, 伽辽金无网格方法}
-    \end{axis}
-    \end{tikzpicture}
-    \end{comment}
-    \caption{训练时间对比}
-
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \begin{tikzpicture}
+        \begin{axis}[
+            title={训练时间对比},
+            ybar,
+            bar width=0.2cm,
+            enlargelimits=0.2,
+            legend style={at={(0.5,-0.2)}, anchor=north, legend columns=-1},
+            ylabel={训练时间 (秒)},
+            symbolic x coords={1000 步, 10000 步, 20000 步},
+            xtick=data,
+            ymin=0, ymax=300,
+            nodes near coords,
+            nodes near coords align={vertical},
+            every node near coord/.append style={font=\scriptsize, xshift=0pt, yshift=2pt},
+            width=\textwidth,
+            height=6cm
+        ]
+        \addplot[fill=blue!50] coordinates {(1000 步, 3.36) (10000 步, 34.79) };
+        \addplot[fill=green!50] coordinates {(1000 步, 23.95) (10000 步, 244.76) }; % 添加 20000 步数据，假设为 0
+        \legend{DeepRitz 方法, RK-DeepRitz 方法}
+        \end{axis}
+        \end{tikzpicture}
+    \end{minipage}
+    \hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \begin{tikzpicture}
+        \begin{axis}[
+            title={计算时间对比},
+            ybar,
+            bar width=0.2cm,
+            enlargelimits=0.2,
+            legend style={at={(0.5,-0.2)}, anchor=north, legend columns=-1},
+            ylabel={计算时间 (秒)},
+            symbolic x coords={1000 步, 10000 步, 伽辽金无网格},
+            xtick=data,
+            ymin=0, ymax=0.35,
+            nodes near coords,
+            nodes near coords align={vertical},
+            every node near coord/.append style={font=\scriptsize, xshift=0pt, yshift=2pt},
+            width=\textwidth,
+            height=6cm
+        ]
+        \addplot[fill=blue!50] coordinates {(1000 步, 0.001) (10000 步, 0.0015)}; % DeepRitz 计算时间
+        \addplot[fill=green!50] coordinates {(1000 步, 0.01) (10000 步, 0.01)}; % RK-DeepRitz 计算时间
+        \addplot[fill=red!50] coordinates {(伽辽金无网格, 0.3)}; % 伽辽金无网格计算时间
+        \legend{DeepRitz 方法, RK-DeepRitz 方法, 伽辽金无网格方法}
+        \end{axis}
+        \end{tikzpicture}
+    \end{minipage}
+    \caption{训练时间和计算时间对比}
     \label{fig:time_comparison}
-    \end{figure}
+\end{figure}
     
-    从图 \ref{fig:time_comparison} 可以看出，DeepRitz 方法的训练时间随步数增加显著增长（1000 步 23.95 秒，10000 步 34.79 秒，20000 步 70.88 秒），而 EFG-DeepRitz 方法训练时间更长（1000 步 3.36 秒，10000 步 244.76 秒），反映了再生核增强引入的额外计算开销。计算时间方面，DeepRitz 方法（0.001 秒至 0.002 秒）和 EFG-DeepRitz 方法（0.01 秒）均远低于伽辽金无网格方法（0.3 秒），表明深度学习方法在推理阶段的高效性。综合来看，EFG-DeepRitz 方法虽然训练时间较长，但计算时间仍具优势，适合需要快速推理的应用场景。
+    从图 \ref{fig:time_comparison} 可以看出，DeepRitz 方法的训练时间随步数增加显著增长，而 RK-DeepRitz 方法训练时间更长，反映了再生核增强引入的额外计算开销。
 
 \newpage
 \subsection{对比RKPM方法}
@@ -1147,18 +1168,62 @@ DeepRitz 方法初始 L2 误差和 H1 误差较高（2.0 和 1.75），前 200 �
     \caption{L2误差对比}
     \label{fig:combined}
 \end{figure}
-RKPM 方法的 L2 误差和 H1 误差分别为 0.011709 和 0.043137，误差分布平滑但边界处导数误差较大；EFG-DeepRitz 方法的 L2 误差为 0.002368（比 RKPM 低约 80\%），H1 误差为 0.058213（高约 35\%），L2 误差分布波动较大但精度更高，导数误差波动性强。EFG-DeepRitz 结合深度学习显著提升了 L2 误差的拟合能力，但导数拟合较弱.
+RKPM 方法的误差分布平滑但边界处导数误差较大；RK-DeepRitz 方法的误差分布波动较大但精度更高，导数误差波动性强。RK-DeepRitz 结合深度学习显著提升了 L2 误差的拟合能力，但导数拟合较弱.
+
+\begin{comment}
+\subsection{小结}
+\begin{figure}[htbp]
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+        \includegraphics[width=\textwidth, height=6cm, keepaspectratio]{figures/3-2-1.png}
+        \caption{RKPM方法绝对误差}
+        \label{fig:deepritz_solutions}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+        \includegraphics[width=\textwidth, height=6cm, keepaspectratio]{figures/4-1.png}
+        \caption{再生核增强10000步绝对误差}
+        \label{fig:absolute_error}
+    \end{subfigure}
+
+    \centering
+    \caption{误差可视化。}
+    \label{fig:combined}
+\end{figure}
+
+\begin{figure}[htbp]
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+        \includegraphics[width=\textwidth, height=6cm, keepaspectratio]{figures/5-1-1.png}
+        \caption{RKPM方法L2误差}
+        \label{fig:deepritz_solutions}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+        \includegraphics[width=\textwidth, height=6cm, keepaspectratio]{figures/5-2-1.png}
+        \caption{再生核增强10000步L2误差}
+        \label{fig:absolute_error}
+    \end{subfigure}
+
+    \centering
+    \caption{L2误差对比}
+    \label{fig:combined}
+\end{figure}
+\end{comment}
+
 
 \chapter{结论}
-本文提出的再生核增强深度 Ritz 法（EFG-DeepRitz）融合深度学习与无网格方法，基于 Ritz 变分原理，通过再生核增强提升偏微分方程求解的精度与效率。方法在深度神经网络框架下引入再生核近似，针对一维问题实现显著的 $L^2$ 误差降低，展现出较高的推理效率与应用潜力。
+本文提出的再生核增强深度 Ritz 法（RK-DeepRitz）融合深度学习与无网格方法，基于 Ritz 变分原理，通过再生核增强提升偏微分方程求解的精度与效率。方法在深度神经网络框架下引入再生核近似，针对一维问题实现显著的 $L^2$ 误差降低，展现出较高的推理效率与应用潜力。
 
-实现过程如下：首先，深度 Ritz 方法以一维拉压杆模型为基础，传统 Ritz 方法通过预定义基函数近似位移场，而深度 Ritz 方法利用神经网络替代基函数，验证了其数值有效性。其次，伽辽金无网格法（RKPM）从弱形式出发，通过无网格离散化构造形状函数，结合拉格朗日乘子法强制边界条件并采用高斯积分法近似积分，显示出较好的导数拟合能力。最后，本文主要实现再生核近似增强深度 Ritz 法，通过再生核近似机制增强局部解表达能力，验证了方法的优越性。
-
-算例验证以一维泊松方程为例，EFG-DeepRitz 方法在 10000 步训练后 $L^2$ 误差 0.002368 优于 RKPM（0.011709）和 DeepRitz（0.016862），$H^1$ 误差 0.058213 虽高于 RKPM（0.043137）但低于 DeepRitz（0.080057），误差分布显示其在中间区域精度更高，但导数误差波动较大，边界处需进一步优化。训练时间 244.76 秒长于 DeepRitz（34.79 秒）和 RKPM（无训练时间），但计算时间 0.01 秒远低于 RKPM（0.3031 秒），验证了方法在推理效率上的优势，为复杂偏微分方程求解提供了新颖且高效的数值工具。
-增强深度 Ritz 方法通过引入 EFG 形状函数，增强了模型的表达能力，尤其在局部区域的逼近精度上表现优异。较低的 L2 和 H1 误差表明该方法更适合处理具有复杂梯度变化的偏微分方程问题。
+首先，深度 Ritz 方法以Ritz方法为基础，通过预定义基函数近似位移场，而深度 Ritz 方法利用神经网络替代试函数，验证了其数值有效性。其次，伽辽金无网格法（RKPM）从弱形式出发，通过无网格离散化构造形状函数，结合拉格朗日乘子法强制边界条件并采用高斯积分法近似积分，显示出较好的导数拟合能力。最后，本文主要实现再生核近似增强深度 Ritz 法，通过再生核近似机制增强局部解表达能力，验证了方法的优越性。
 
 尽管增强方法性能优于原始深度 Ritz 方法，但 H1 误差中的梯度误差仍较高。这可能是由于网络深度或宽度不足，或训练步数有限（1000 步可能不足以充分收敛）。建议增加训练步数（例如到 5000 或 10000 步）或调整超参数（如学习率、惩罚系数）以进一步优化梯度逼近。
 
+RK-DeepRitz 方法在 $L^2$ 误差上优于 RKPM 和 DeepRitz，在 $H^1$ 误差上低于 DeepRitz 但高于 RKPM，中间区域精度更高，导数误差波动较大，边界处需优化。训练时间较长但计算时间远低于 RKPM，验证了推理效率优势，为复杂偏微分方程求解提供了高效工具。增强深度 Ritz 方法通过 EFG 形状函数提升表达能力，适合处理复杂梯度变化问题。增强方法性能优于原始方法，但 $H^1$ 梯度误差仍较高，建议增加训练步数或调整超参数以优化梯度逼近。
 
 
 
