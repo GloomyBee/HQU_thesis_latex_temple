@@ -26,34 +26,34 @@
 \mainmatter
 \chapter{绪论}
 \section{研究背景和意义}
-有限元法通过将问题的求解区域离散为有限单元并按一定方式连接，利用每个单元的近似函数分片表达未知场函数，并利用加权余量法等原理建立各节点量的关系式，最后通过一定算法求解方程组得到原问题的解。有限元法作为一种通用灵活的解法广泛使用，但随着对象的复杂程度增加，暴露了许多问题，如网格单元剖分，大变形问题网格畸变等，因此在有限元法的基础上针对网格存在的问题提出了一类新的方法，即无网格法。
+有限元法（FEM）和无网格方法是求解偏微分方程（PDE）的传统数值方法。有限元法通过将求解区域离散为有限单元，利用分片近似函数和加权余量法建立方程组求解，但其网格划分在高维和大变形问题中易导致计算成本高和网格畸变等问题。为此，无网格方法通过节点排列和核函数近似构造整体协调形函数，无需依赖单元连接，适用于大变形和复杂几何问题。其中，伽辽金型无网格法基于弱形式数值离散，具有高精度和灵活性，但其形函数非插值性和数值积分复杂性导致计算效率低下。近年来，深度学习技术的兴起为PDE求解提供了新视角，Deep里兹方法作为一种结合深度学习和里兹变分法的数值方法，展现了在高维PDE求解中的潜力。
 
-无网格法通过对求解域内采用一系列节点排列以及核函数近似，使得所求域上节点可以影响研究对象上任意一点的力学特性，只需要节点位置信息而不依赖节点间的有序单元连接，能够生成任意高阶连续的整体协调形函数。与传统有限元法相比，无网格法在求解大变形问题、移动边界问题和高阶问题时具有显著优势，尤其适用于土木工程中的复杂数值计算。伽辽金型无网格法是目前应用最广泛的无网格法分支之一，其基于弱形式的数值离散在理论上兼具高精度和高灵活性。然而，伽辽金型无网格法的形函数通常不具备多项式特性，且具有非插值性，影响域与背景积分网格往往不重合，导致数值积分需依赖高阶高斯积分。这使得计算效率低下，难以高效处理土木工程中的大型实际问题。因此，如何提升伽辽金型无网格法的计算效率成为算法研究领域的核心挑战之一。
+Deep里兹方法是一种结合深度学习和里兹变分法的数值方法，鄂维南院士首次提出该方法，通过将PDE的变分形式转化为能量泛函的优化问题，利用深度神经网络逼近试探函数求解PDE。其核心在于通过随机采样定义域内的点，计算能量泛函的数值积分，并利用梯度下降法训练神经网络，使其逼近PDE的解。这种方法无需网格划分，适用于复杂几何和高维问题。相较于有限元法，Deep里兹方法通过无网格的神经网络逼近克服了“维度灾难”；与物理信息神经网络（PINNs）相比，PINNs基于强形式残差构造损失函数可能导致训练困难，而Deep里兹方法基于变分形式优化能量泛函，训练更稳定；与基于弱形式的光滑粒子流体动力学（SPH）或无单元Galerkin方法（EFG）相比，Deep里兹方法利用深度神经网络的通用逼近能力，更灵活地逼近复杂函数形式，适合非线性PDE求解。与Deep里兹方法相似的深度学习方法也得到了发展，如Deep Galerkin方法试图基于弱形式构造神经网络算法，但实际上基于最小二乘法，弱形式实现面临类似生成对抗网络（GAN）的挑战；PINNs则通过强形式残差优化，广泛应用于椭圆和抛物PDE求解。然而，Deep里兹方法仍存在计算成本高、理论分析不足、边界条件处理困难、训练不稳定、弱形式实现困难以及在特定PDE（如随机PDE和演化PDE）中适用性有限等问题。
 
-近年来，深度学习技术的兴起为数值解算提供了新视角。深度利兹法（Deep Ritz Method）通过神经网络直接优化变分问题的能量泛函，无需显式网格划分，在复杂边界条件和高维问题的求解中展现出独特优势。然而，传统深度利兹法在高阶问题中的收敛性不足、对网络训练参数敏感，导致其在土木工程复杂场景下的解算精度和稳定性有待优化。再生核近似作为伽辽金型无网格法的重要理论基础，以其高精度逼近和插值能力，为增强深度学习模型提供了潜力。如何将再生核近似的高阶特性与深度利兹法的优化能力相结合，成为提升数值解算性能的关键问题。
-
-本文提出基于再生核近似的增强深度利兹法，旨在优化传统深度学习模型在土木工程问题中的数值解算效果。通过将再生核近似融入深度利兹法的神经网络框架，本研究不仅探索其理论可行性，还分析其在精度、效率和稳定性方面的改进效果。研究总结了伽辽金型无网格法中再生核近似的基本原理，结合深度利兹法的变分求解特点，探讨两者融合在土木工程数值计算中的应用前景。本方法的提出旨在为复杂工程问题的解算提供高效、稳定的算法支持，推动数值计算领域的理论与实践发展。
+本文提出基于再生核近似的增强Deep里兹方法，旨在优化其在土木工程复杂场景下的解算精度和稳定性。再生核方法（RKPM）通过再生核希尔伯特空间理论逼近函数，具有数学完备性和高精度逼近能力，可以为Deep里兹方法提供理论支持，弥补其理论分析不足的缺陷，同时其在边界条件处理和多尺度分析中的优势可改进Deep里兹方法在复杂边界条件和演化PDE中的表现。通过将再生核近似融入Deep里兹方法的神经网络框架，本研究不仅探索其理论可行性，还分析其在精度、效率和稳定性方面的改进效果，为复杂工程问题的数值解算提供高效、稳定的算法支持，推动深度学习与传统数值方法的深度融合。
 \section{国内外研究现状}
-伽辽金型无网格法是无网格方法的重要分支，以高阶光滑性和复杂问题适应性著称。Belytschko等人于1994年提出伽辽金无单元法（Element Free Galerkin Method, EFG），基于移动最小二乘近似构造形函数，通过背景网格和高阶积分提升精度。此后，Liu等人于1995年提出再生核近似（Reproducing Kernel Approximation, RK），通过多项式再生条件和校正函数改进逼近能力，发展出再生核质点法（RKPM），显著增强了数值稳定性（Liu, 1995）。再生核理论在数值逼近、插值和数据拟合中具有显著优势。深度利兹法（Deep Ritz Method）由E W和Yu B于2017年提出，利用深度神经网络最小化变分问题的能量泛函，为偏微分方程求解提供了新途径（E W, 2017）。该方法无需网格划分，在处理复杂边界条件和高维问题时表现出灵活性。本文旨在探讨再生核近似的理论基础及其在增强深度利兹法中的应用效果，为土木工程中的数值计算和模型预测提供创新性方法。
+神经网络求解微分方程的发展为Deep里兹方法的提出奠定了基础。1969年，Minsky和Papert证明，简单的两层感知器（单层神经网络）无法有效表示或逼近一类重要的函数，例如异或函数。他们指出，简单感知器只能处理线性可分问题，对于非线性问题（如大多数实际应用中的函数）无能为力。但他们指出足够复杂的多层前馈网络或许能够逼近应用中遇到的几乎所有函数。1989年，H.White等人证明只有一层隐藏层的多层前馈网络确实能够以非常精确和令人满意的方式进行通用近似，这一定理表明，多层网络具有通用逼近能力，能够逼近包括PDE解在内的复杂函数形式。多层网络逼近能力的实现依赖于有效的训练算法，Hecht-Nielsen在1989年提出的反向传播算法（Backpropagation）为其训练提供了技术支持，反向传播算法通过梯度下降法迭代更新网络权重，使多层网络能够学习复杂的函数映射。1990年，Lee Hyuk等人提出了利用神经网络优化能力求解差分方程的方法，通过构造能量函数并利用神经网络最小化能量，标志着神经网络在微分方程求解中的开端。同年，S. Peng等人提出了倒向随机微分方程（BSDE）的适配解理论，奠定了BSDE研究的数学基础。BSDE是一种特殊的随机微分方程，其解需要在终止时刻满足特定条件，并通过布朗运动的反向积分求解。Peng等人证明了在驱动函数满足Lipschitz条件的情况下，BSDE存在唯一的适配解，并探讨了BSDE与非线性PDE的联系。这一理论为随机PDE的求解提供了新的视角。X. Warin（2005）提出了一种基于回归的蒙特卡洛方法求解BSDE，N. Touzi（2013）提出了一种基于分支过程的BSDE求解算法，Jia Zhuo（2013）提出了一种原-对偶算法提高BSDE求解效率。这些方法为Deep里兹方法处理高维和随机PDE提供了方法论参考。2010年代，深度学习技术的突破为神经网络求解微分方程注入了新的活力。Jimmy Ba等人中提出的Adam优化算法通过自适应调整学习率加速收敛，成为Deep里兹训练的核心工具（2014）。Jian Sun等人提出的ResNet通过残差连接解决了深层网络的训练问题，为Deep里兹提供了更强大的网络结构；最终，Deep里兹方法由E Weinan和Yu Bing于2017年提出，结合深度神经网络和里兹变分法，克服了传统方法在高维PDE求解中的“维度灾难”问题，其提出是神经网络逼近理论、数值方法探索和深度学习技术共同发展的结果。
+
+再生核方法（Reproducing Kernel Method, RKM）作为一种无网格数值方法，在偏微分方程（PDE）求解中展现了强大的灵活性和逼近能力，为Deep里兹方法的提出提供了重要的理论和方法论支持。再生核方法的发展源于无网格方法的早期探索。1977年，Gingold和Monaghan提出了光滑粒子流体动力学（SPH），通过粒子分布和光滑核函数逼近解，成为无网格方法的先驱。1982年，Monaghan进一步分析了SPH的工作原理，指出其在流体力学中的优势，但其逼近精度和稳定性仍需改进。1980年，Liszka提出了在任意不规则网格上应用有限差分方法（FDM），为无网格方法的发展提供了背景。1994年，Belytschko等人提出了无单元Galerkin方法（EFG），基于移动最小二乘（MLS）逼近构造试探函数，结合Galerkin弱形式求解PDE，成功应用于断裂和裂纹扩展问题，为再生核方法奠定了基础。1995年，Wing Kam Liu等人在正式提出了再生核粒子方法（RKPM），通过构造再生核函数逼近解，结合粒子分布进行数值积分，显著改进了SPH的逼近精度和稳定性。同年，Liu提出了基于小波和多尺度的再生核方法，结合小波变换提高RKPM的多尺度分析能力，扩展了其在复杂问题中的应用。1996年，Krongauz改进了EFG方法的边界条件施加方法，为RKPM的边界处理提供了参考。同年，Belytschko综述了无网格方法的最新进展，指出RKPM在高维问题和大变形中的优势，但计算复杂度和边界条件处理仍需改进。再生核方法与Deep里兹方法在无网格思想和函数逼近上具有相似性，RKPM通过再生核希尔伯特空间理论逼近函数，而Deep里兹通过深度神经网络逼近解，两者都避免了传统有限元方法的网格划分，为高维PDE求解提供了新思路。再生核方法的数学完备性为Deep里兹方法的理论增强提供了潜力，而Deep里兹方法则通过深度学习技术提升了再生核方法的计算效率。
+
+
 \section{本文研究内容和组织结构}
 本文旨在研究并实现一种基于再生核近似的增强深度利兹法，优化传统深度学习模型在土木工程问题中的数值解算效果，重点针对一维拉压杆等弹性力学问题的微分方程求解，探索其在复杂工程场景中的应用潜力。研究内容涵盖理论分析、方法介绍及算法创新，围绕一维拉压杆问题展开系统研究，同时为更广泛的土木工程数值计算提供支持。
 
-本文第一部分从一维拉压杆问题的微分方程求解入手，基于弹性力学原理分析其控制微分方程及其边界条件。通过建立明确的数学模型，为后续数值方法的验证提供基础算例。
+本文第一部分从一维拉压杆问题的微分方程求解入手，基于弹性力学原理分析其控制微分方程及其边界条件，通过建立明确的数学模型。同时介绍深度利兹法的理论与应用，阐释其通过神经网络最小化能量泛函的变分求解原理，分析其在土木工程数值解算中的适用性。以一维拉压杆问题为例，设计数值算例，验证传统深度利兹法的解算精度与效率，同时识别其在高阶问题中的局限性，为后续改进提供依据。
 
-本文第二部分介绍深度利兹法的理论与应用，阐释其通过神经网络最小化能量泛函的变分求解原理，分析其在土木工程数值解算中的适用性。以一维拉压杆问题为例，设计数值算例，验证传统深度利兹法的解算精度与效率，同时识别其在高阶问题中的局限性，为后续改进提供依据。
+本文第二部分介绍伽辽金型无网格法的理论与实践，阐述其基于节点构造高阶形函数的基本原理，重点分析数值积分的实现方式。以一维拉压杆问题为算例，验证伽辽金无网格法（如再生核质点法）的逼近能力和稳定性，探讨其计算复杂度与边界处理问题，为增强方法的开发提供参考。
 
-本文第三部分介绍伽辽金型无网格法的理论与实践，阐述其基于节点构造高阶形函数的基本原理，重点分析数值积分的实现方式。以一维拉压杆问题为算例，验证伽辽金无网格法（如再生核质点法）的逼近能力和稳定性，探讨其计算复杂度与边界处理问题，为增强方法的开发提供参考。
-
-本文第四部分研究基于再生核近似的增强深度利兹法。分析再生核近似的高精度逼近特性与深度利兹法的变分求解原理，推导两者结合的数学框架，探索增强深度利兹法的理论可行性。利用Python编程设计增强算法模型，将再生核形函数融入神经网络结构，改进损失函数，在数值验证与分析中，以一维拉压杆问题为对象，验证增强方法的性能。
+本文第三部分研究基于再生核近似的增强深度利兹法。分析再生核近似的高精度逼近特性与深度利兹法的变分求解原理，推导两者结合的数学框架，探索增强深度利兹法的理论可行性。利用Python编程设计增强算法模型，将再生核形函数融入神经网络结构，改进损失函数，在数值验证与分析中，以一维拉压杆问题为对象，验证增强方法的性能。
 
 \clearpage
 
 \newpage
-\chapter{深度Ritz计算方法}
-本章运用深度 Ritz 方法对一维线弹性夹紧板模型进行数值计算，深度 Ritz 方法其核心思想是将变分问题转化为优化问题，通过深度学习框架高效求解偏微分方程。即通过构造一个神经网络来逼近问题的解，利用变分原理将 PDE 的满足转化为能量泛函的最小化问题，从而避免了传统数值方法中网格划分的复杂性。本章最后针对一维拉压杆问题进行数值分析以及数值实验。
+\chapter{深度里兹计算方法}
+本章运用深度 里兹 方法对一维拉压杆模型进行数值计算，深度 里兹 方法其核心思想是将变分问题转化为优化问题，通过深度学习框架高效求解偏微分方程。即通过构造一个神经网络来逼近问题的解，利用变分原理将 PDE 的满足转化为能量泛函的最小化问题，从而避免了传统数值方法中网格划分的复杂性。本章最后针对一维拉压杆问题进行数值分析以及数值实验。
 
 \section{一维拉压杆模型的计算方法}
-\section*{平衡微分方程}
+
 考虑一均匀等截面杆，长度为 \( l \)，横截面积为 \( A \)，弹性模量为 \( E \)。杆的左端固定（位移为零），右端施加拉力 \( F \)，杆整体施加单位长度的体力 \( q \)（假设为常数）。取一微元体，考虑微元的受力平衡：左侧轴力 \( N(x) \)，方向为 \( x \) 轴负方向；右侧轴力 \( N(x + dx) \)，方向为 \( x \) 轴正方向。由 \( x \) 方向的平衡方程有：
 \begin{equation}
     N(x + dx) - N(x) + q \, dx = 0
@@ -69,29 +69,28 @@
     N = EA \frac{du}{dx}
     \label{eq:axial_force}
 \end{equation}
-方程形式：
+其中 \( EA \) 为杆的轴向刚度。将此关系代入平衡方程 \eqref{eq:equilibrium2}，得到：
 \begin{equation}
     \frac{d}{dx} \left( EA \frac{du}{dx} \right) = q
     \label{eq:equilibrium3}
 \end{equation}
-若 \( EA \) 为常数，则：
+假设杆的材料和截面均匀，即 \( EA \) 为常数，则上式进一步简化为：
 \begin{equation}
     \frac{d^2 u}{dx^2} = \frac{q}{EA}
     \label{eq:equilibrium4}
 \end{equation}
-
-\section*{边界条件}
-左端固定：
+此方程为一维拉压杆的控制微分方程，表示位移 \( u(x) \) 满足的二阶常微分方程。
+为了求解上述微分方程，我们需要明确边界条件。杆的左端固定，意味着位移为零，满足 Dirichlet 边界条件：
 \begin{equation}
     u(0) = 0
     \label{eq:bc_left}
 \end{equation}
-右端施加拉力：
+杆的右端受到拉力 \( F \)，根据轴力定义 \( N = EA \frac{du}{dx} \)，右端的 Neumann 边界条件为：
 \begin{equation}
     N(l) = EA \frac{du}{dx} \bigg|_{x=l} = F
     \label{eq:bc_right}
 \end{equation}
-因此对于一维拉压杆模型，其强形式表达式可写为：
+综合控制方程和边界条件，一维拉压杆问题的强形式可表达为以下偏微分方程系统：
 \begin{equation}
     \left\{
     \begin{array}{ll}
@@ -103,8 +102,8 @@
     \label{eq:strong_form_system}
 \end{equation}
 
-\section*{解析解的推导}
-对 \eqref{eq:equilibrium4} 进行积分：
+求解控制方程 \eqref{eq:equilibrium4} 以获得位移 \( u(x) \) 的解析解。由于 \( EA \) 和 \( q \) 均为常数，方程为二阶线性常微分方程，可以通过逐次积分求解。
+
 \begin{enumerate}
     \item 第一次积分：
     \begin{equation}
@@ -142,36 +141,24 @@
     \label{eq:analytical_solution}
 \end{equation}
 
-\section{Ritz 方法}
-变分法在解决边界值问题中发挥着至关重要的作用，其核心思想在于通过构建一个泛函并寻找其极值来间接找到方程的解。Ritz 法是一种常用的近似解法。根据最小势能原理，如果能够列出所有的几何可能位移，那么使总势能取最小值的那一组位移就是真实位移。
+\section{里兹 方法}
+上述强形式 \eqref{eq:strong_form_system} 虽然在数学上完备，但在实际工程问题中往往难以直接求解。首先，强形式要求解函数 \( u(x) \) 在定义域内至少具有二阶连续可导性（即 \( u \in C^2(0, l) \)），这对复杂材料或几何条件（如非均匀截面、变截面杆或非线性材料）可能难以满足。其次，当问题涉及不规则边界、复杂载荷分布或高维偏微分方程时，强形式的解析解通常难以获得，甚至不存在。此外，强形式对边界条件的处理较为严格，若边界条件复杂（如混合边界条件），直接求解将变得更加困难。
+
+为了克服强形式的局限性，工程和数学领域常引入弱形式或变分方法。变分法在解决边界值问题中发挥着至关重要的作用，其核心思想在于通过构建一个泛函并寻找其极值来间接找到方程的解。里兹 法是一种常用的近似解法。根据最小势能原理，如果能够列出所有的几何可能位移，那么使总势能取最小值的那一组位移就是真实位移。
 
 以一维泊松方程为例，其强形式为：
 \begin{equation}
     -\frac{d^2 u}{dx^2} = f(x), \quad x \in (0, 1)
     \label{eq:poisson_strong}
 \end{equation}
-并施加 Dirichlet 边界条件 \( u(0) = 0 \), \( u(1) = 0 \)。为了将其转化为泛函最小值问题，首先构造弱形式。
+并施加 Dirichlet 边界条件 \( u(0) = 0 \), \( u(1) = 0 \)，根据最小势能原理，将其转化为泛函最小值问题：
 
-乘以测试函数 \( v \in H^1_0(0,1) \)（满足边界条件 \( v(0) = v(1) = 0 \)），并对定义域积分：
-\begin{equation}
-    \int_0^1 -\frac{d^2 u}{dx^2} v \, dx = \int_0^1 f v \, dx
-    \label{eq:poisson_integral}
-\end{equation}
-使用分部积分：
-\[
-\int_0^1 -\frac{d^2 u}{dx^2} v \, dx = \left[ -\frac{du}{dx} v \right]_0^1 + \int_0^1 \frac{du}{dx} \frac{dv}{dx} \, dx
-\]
-由于 \( v(0) = v(1) = 0 \)，边界项消失，得到弱形式：
-\begin{equation}
-    \int_0^1 \frac{du}{dx} \frac{dv}{dx} \, dx = \int_0^1 f v \, dx
-    \label{eq:poisson_weak}
-\end{equation}
-弱形式的解 \( u \) 等价于使以下能量泛函取最小值：
+
 \begin{equation}
     J[u] = \int_{\Omega} \left( \frac{1}{2} |\nabla u|^2 - f u \right) \, d\Omega
     \label{eq:energy_functional}
     \end{equation}
-即求解微分方程等价于寻找使 \( J[u] \) 最小的函数 \( u \)。Ritz法通过将假设的解代入泛函中，构造关于假设解参数的表达式，通过优化参数使泛函达到极值，实现泛函最小化。例如：
+即求解微分方程等价于寻找使 \( J[u] \) 最小的函数 \( u \)。里兹法通过将假设的解代入泛函中，构造关于假设解参数的表达式，通过优化参数使泛函达到极值，实现泛函最小化。例如：
 
 
 
@@ -224,10 +211,10 @@
     
 
 
-\section{深度 Ritz 方法}
-有限元方法(FEM)、虚拟元方法(VEM)都受网格剖分的限  制,只有当网格剖分达到足够精细的程度时,才能满足计算精度的要求,这将不可避免增  加计算的时间和成本。但深度 Ritz 法不受网格剖分的限制,传统方法中，基函数是预先选定的，深度 Ritz 方法用神经网络作为基函数的表示，即由深度神经网络定义的非线性变换。选择能量泛函作为损失函数，通过优化神经网络参数来最小化泛函，从而代替方程求解。
+\section{深度 里兹 方法（DR方法）}
+有限元方法(FEM)、虚拟元方法(VEM)都受网格剖分的限  制,只有当网格剖分达到足够精细的程度时,才能满足计算精度的要求,这将不可避免增  加计算的时间和成本。但深度 里兹 法不受网格剖分的限制,传统方法中，基函数是预先选定的，深度 里兹 方法用神经网络作为基函数的表示，即由深度神经网络定义的非线性变换。选择能量泛函作为损失函数，通过优化神经网络参数来最小化泛函，从而代替方程求解。
 
-构建网络是深度 Ritz 的关键环节，其网络的每一层结构是通过将多个块进行叠加来构建的。每个块内部包含两个线性变换、两个激活函数以及一个残差连接，残差连接使网络更容易训练，而且有助于避免梯度消失问题。
+构建网络是深度 里兹 的关键环节，其网络的每一层结构是通过将多个块进行叠加来构建的。每个块内部包含两个线性变换、两个激活函数以及一个残差连接，残差连接使网络更容易训练，而且有助于避免梯度消失问题。
 
 在第一个全连接层后，输入 \( X \) 的维数由原定值转化为 \( m \)，这样可以增加网络中的权重，以此来提高网络的准确性。网络中的第一个全连接层对应的函数为：
 \begin{equation}
@@ -265,166 +252,47 @@
 蒙特卡洛方法的核心思想是通过随机采样来估计这个积分的值。
 
 为了高效处理这种情况，我们选择了随机梯度下降（SGD）方法作为解决方案。其中，\( x_i \) 是均匀分布在 \( \Omega \) 上的独立同分布随机变量。损失函数被用来估计神经网络的输出与真实值之间的差异，并为神经网络中的参数优化提供方向。在神经网络反向传播过程中，选择 Adam 优化器，逐层更新参数，使损失函数逐渐减小，直到收敛。
+\section{小结}
 
-\section{数值结果}
-考虑两端固定的一维弹性杆问题：
+本章系统介绍了深度里兹方法及其在一维拉压杆模型中的应用，为后续数值分析和实验奠定了理论基础。深度里兹方法通过将偏微分方程（PDE）的变分形式转化为能量泛函的优化问题，利用深度神经网络逼近试探函数，避免了传统数值方法中网格划分的复杂性，展现了其在高维和复杂几何问题中的潜力。在一维拉压杆模型的推导中，我们从力平衡原理出发，建立了控制微分方程，并结合 Dirichlet 和 Neumann 边界条件，得到了问题的强形式和解析解，为深度里兹方法的数值求解提供了理论参照。里兹方法部分通过变分原理和弱形式推导，阐明了能量泛函最小化的数学基础，并通过基函数构造和线性方程组求解展示了传统里兹方法的实现过程。深度里兹方法则进一步将神经网络引入变分框架，采用多层网络结构和残差连接提高训练稳定性，通过蒙特卡洛方法离散泛函积分，并利用随机梯度下降和 Adam 优化器高效优化网络参数。综上，本章从理论推导到方法实现，全面梳理了深度里兹方法的核心思想和计算流程，为后续针对一维拉压杆问题的数值实验提供了坚实的理论和方法支持。
+
+
+
+
+\chapter{再生核粒子法（RKPM方法）}
+
+尽管 里兹 法及其深度扩展在许多问题中表现出色，但其主要依赖于变分原理，即要求问题能够转化为一个等价的泛函极值问题。然而，对于某些偏微分方程（如非对称算子或非变分形式的问题），变分原理可能并不适用，这限制了 里兹 法的应用范围。相比之下，伽辽金法（Galerkin 方法）作为一种更通用的弱形式数值方法，直接基于弱形式方程，通过在有限维子空间中构造试探函数和测试函数，构建离散化的线性方程组，从而求解偏微分方程。伽辽金法不仅适用于变分形式的问题，还能处理更广泛的偏微分方程，具有更强的适应性和理论完备性。因此，在第三章中，我们将重点探讨伽辽金法的理论基础、实现方法及其在偏微分方程求解中的应用，为后续研究提供更全面的数值方法视角。
+\section{里兹-伽辽金弱形式}
+为了推导一维偏微分方程的弱形式，我们以一维弹性问题为例，考虑一个一维杆件在区间 \( \Omega = [0, L] \) 上的变形问题。假设杆件受到体视显微镜力 \( b(x) \) 和边界牵引力 \( t \)，其位移场为 \( u(x) \)。对应的强形式偏微分方程可以写为：
 \begin{equation}
-    \begin{cases}
-        -\nabla^2 u  = -1, & x \in (0, 1) \\
-        u(0) = 0 \\
-        u(1) = 1
-    \end{cases}
-\label{eq:strong_form}
-\end{equation}
-该问题的解析解为
-
-\begin{equation}
-    u(x) = \frac{1}{2} x^2 + \frac{1}{2} x
-    \label{eq:strong_form1}
-\end{equation}
-
-本章构建的神经网络基于一个简单的多层感知机结构，具有一个输入层、一个隐藏层和一个输出层，分别对应 1 维输入和 1 维输出，隐藏层的宽度 \( m \) 为 50。本次用于近似一维微分方程的网络是由一个块（两个全连接层）、一个输入层和一个输出层组成的。
-
-边界条件会导致一些问题，通过在损失函数中加入边界条件的残差项，强制网络解在边界处逼近给定值，作为惩罚项来间接强制网络满足边界条件。本章边界损失通过 1000 倍的惩罚系数来增强。
-
-对应于体积分损失，通过蒙特卡洛方法（随机采样点）近似积分：
-\begin{equation}
-    L_{\text{vol}} = \frac{1}{N} \sum_{i=1}^N \left( \frac{1}{2} |\nabla u_{\theta}(x_i)|^2 - f(x_i) u_{\theta}(x_i) \right)
-    \label{eq:volume_loss}
-    \end{equation}
-对应于边界条件损失：
-\begin{equation}
-    L_{\text{bdy}} = \frac{1}{M} \sum_{j=1}^M |u_{\theta}(x_j) - g(x_j)|^2
-    \label{eq:boundary_loss}
-    \end{equation}
-总损失为：
-\begin{equation}
-    L = L_{\text{vol}} + 1000 \cdot L_{\text{bdy}}
-    \label{eq:total_loss}
-    \end{equation}
-
-对该问题采用20000 次迭代的梯度下降，使用 Adam 优化器，初始学习率为 0.001，并通过 StepLR 调度器以每 5000 步减少至原来的 30\% 来优化学习率。
-
-为了更定量地分析误差，考虑解析解，用均方误差来近似误差：
-\begin{equation}
-    \text{误差} = \int_{\Omega} |u_{\text{exact}}(x) - u_{\theta^*}(x)|^2 \, dx
-    \label{eq:error}
-    \end{equation}
-计算误差如下：
-\begin{comment}
-\begin{figure}[htbp]
-    \centering
-    \begin{subfigure}[b]{0.45\textwidth}
-        \centering
-        \includegraphics[width=\textwidth, height=6cm, keepaspectratio]{figures/3-3-1.png}
-        \caption{预测解与精确解对比}
-        \label{fig:predicted_vs_exact}
-    \end{subfigure}
-    \hfill
-    \begin{subfigure}[b]{0.45\textwidth}
-        \centering
-        \includegraphics[width=\textwidth, height=6cm, keepaspectratio]{figures/3-3-4.png}
-        \caption{绝对误差分布}
-        \label{fig:absolute_error}
-    \end{subfigure}
-    \\
-    \begin{subfigure}[b]{0.45\textwidth}
-        \includegraphics[width=\textwidth, height=6cm, keepaspectratio]{figures/3-3-2.png}
-        \caption{初始损失下降（前 100 步）}
-        \label{fig:initial_loss}
-    \end{subfigure}
-    \hfill
-    \begin{subfigure}[b]{0.45\textwidth}
-        \includegraphics[width=\textwidth, height=6cm, keepaspectratio]{figures/3-3-3.png}
-        \caption{收敛损失（第 100 步之后）}
-        \label{fig:convergence_loss}
-    \end{subfigure}
-    \caption{训练过程与结果可视化}
-    \label{fig:combined}
-\end{figure}
-\end{comment}
-\begin{figure}[htbp]
-    \centering
-    \begin{subfigure}[b]{0.45\textwidth}
-        \centering
-        \includegraphics[width=\textwidth, height=6cm, keepaspectratio]{figures/3-3-4.png}
-        \caption{绝对误差分布}
-        \label{fig:absolute_error1}
-    \end{subfigure}
-    \hfill
-    \begin{subfigure}[b]{0.45\textwidth}
-        \includegraphics[width=\textwidth, height=6cm, keepaspectratio]{figures/3-3-3.png}
-        \caption{收敛损失（第 100 步之后）}
-        \label{fig:convergence_loss}
-    \end{subfigure}
-    \caption{训练过程与结果可视化}
-    \label{fig:combined}
-\end{figure}
-
-
-\begin{comment}
-\begin{table}[htbp]
-    \centering
-    \caption{预测解与解析解的部分数据对比}
-    \label{tab:solution_data}
-    \begin{tabular}{|c|c|c|}
-        \hline
-        $x$ & 预测解 & 解析解 \\ \hline
-        0.0000 & 0.000498 & 0.000000 \\ \hline
-        0.0101 & 0.006083 & 0.005102 \\ \hline
-        0.0202 & 0.011733 & 0.010305 \\ \hline
-        0.0303 & 0.017449 & 0.015611 \\ \hline
-        0.0404 & 0.023232 & 0.021018 \\ \hline
-        \vdots & \vdots & \vdots \\ \hline
-        0.9596 & 0.943819 & 0.940210 \\ \hline
-        0.9697 & 0.957579 & 0.955005 \\ \hline
-        0.9798 & 0.971285 & 0.969901 \\ \hline
-        0.9899 & 0.984930 & 0.984900 \\ \hline
-        1.0000 & 0.998504 & 1.000000 \\ \hline
-    \end{tabular}
-\end{table}
-表显示，当使用更多的块时，深度 Ritz 方法没有给出更准确的近似解。然而，由于方程的复杂性，当块的数量增加到 2 个时，迭代过程中会出现过拟合现象。
-\end{comment}
-
-\subsection*{结果分析}
-
-Deep Ritz 方法在一维问题中表现出色，绝对误差保持在 \( 10^{-3} \) 数量级，最大误差 0.008 出现在 \( x \approx 0.8 \) 附近（图 \ref{fig:absolute_error1}），显示出较高的精度，但中间区域误差略高可能与网络捕捉高阶导数能力不足有关。初期损失从 300 快速下降至 1.78，后期平滑收敛至 0.96（图 \ref{fig:convergence_loss}），表明其计算效率高且优化稳定。相比传统有限元法，Deep Ritz 无需网格划分即可达到较低误差，计算复杂度集中于初期训练，适合高维问题和复杂几何场景，在避免维度灾难和处理非规则边界方面具有显著潜力.
-    
-\begin{figure}[htbp]
-    \centering
-    \begin{subfigure}[b]{0.45\textwidth}
-        \centering
-        \includegraphics[width=\textwidth, height=6cm, keepaspectratio]{figures/3-1-1.png}
-        \caption{深度Ritz法-1000步训练}
-        \label{fig:ritz1000}
-    \end{subfigure}
-    \hfill
-    \begin{subfigure}[b]{0.45\textwidth}
-        \centering
-        \includegraphics[width=\textwidth, height=6cm, keepaspectratio]{figures/3-2-1.png}
-        \caption{深度Ritz法-10000步训练}
-        \label{fig:ritz10000}
-    \end{subfigure}
-    \caption{拟合失败情况}
-    \label{fig:combined}
-\end{figure}
-
-深度 Ritz 方法在 1000 步训练时的拟合失败情况显著，如（图 \ref{fig:ritz1000}）所示，预测解（蓝色曲线）与精确解（橙色曲线）存在明显偏差。这表明模型在有限迭代步数下未能充分收敛，说明训练步数不足以优化网络参数 \(\theta\)，权重未适配短时训练。相比之下，10000 步训练（图 \ref{fig:ritz10000}）显示预测解与精确解几乎重合，验证了深度Ritz法迭代次数的重要性。
-\chapter{伽辽金无网格法}
-
-\section{弱形式推导}
-考虑强形式 \eqref{eq:strong_form_system} 对应的势能泛函表达式，系统的总势能 \( \Pi(\boldsymbol{x}) \) 可表示为内部能量与外部能量的差：
-\begin{equation}
-    \Pi(\boldsymbol{x}) = \underbrace{\int_\Omega \frac{1}{2} \boldsymbol{\sigma} : \boldsymbol{\varepsilon} \, d\Omega}_{\text{内部能量}} - \underbrace{\left( \int_{\Gamma^t} \boldsymbol{u} \cdot \boldsymbol{t} \, d\Gamma + \int_\Omega \boldsymbol{u} \cdot \boldsymbol{b} \, d\Omega \right)}_{\text{外部能量}}
-    \label{eq:total_potential_energy}
+    -\frac{d}{dx} \left( EA \frac{du}{dx} \right) + b(x) = 0, \quad x \in (0, L),
+    \label{eq:strong_form_1d}
 \end{equation}
 
-令上式的变分为零，即 \( \delta \Pi(\boldsymbol{x}) = 0 \)，可得对应的伽辽金弱形式：
+考虑系统的总势能泛函 \( \Pi(u) \)，其由内部应变能和外部功的差构成。对于一维弹性问题，总势能可表示为：
 \begin{equation}
-    \int_\Omega \delta \boldsymbol{\sigma} : \boldsymbol{\varepsilon} \, d\Omega = \int_{\Gamma^t} \delta \boldsymbol{u} \cdot \boldsymbol{t} \, d\Gamma + \int_\Omega \delta \boldsymbol{u} \cdot \boldsymbol{b} \, d\Omega
-    \label{eq:weak_form_galerkin}
+    \Pi(u) = \underbrace{\int_0^L \frac{1}{2} EA \left( \frac{du}{dx} \right)^2 \, dx}_{\text{内部应变能}} - \underbrace{\left( \int_0^L u b(x) \, dx + u(L) t \right)}_{\text{外部功}},
+    \label{eq:total_potential_energy_1d}
 \end{equation}
-其中，\( \delta u(0) \)是虚位移,\( \delta u(0) = 0 \)，满足\(Dirichlet \)条件。
+
+根据变分原理，系统的平衡状态对应于总势能 \( \Pi(u) \) 的极值，即对任意虚位移 \( \delta u \) 满足：
+\begin{equation}
+    \delta \Pi(u) = 0.
+    \label{eq:variational_principle_1d}
+\end{equation}
+对 \( \Pi(u) \) 取变分，计算 \( \delta \Pi(u) \)，得：
+\begin{equation}
+    \delta \Pi(u) = \int_0^L EA \frac{du}{dx} \frac{d(\delta u)}{dx} \, dx - \int_0^L \delta u b(x) \, dx - \delta u(L) t.
+    \label{eq:variation_1d}
+\end{equation}
+令 \( \delta \Pi(u) = 0 \)，转化为以下里兹-伽辽金弱形式：
+\begin{equation}
+    \int_0^L EA \frac{du}{dx} \frac{d(\delta u)}{dx} \, dx = \int_0^L \delta u b(x) \, dx + \delta u(L) t,
+    \label{eq:weak_form_galerkin_1d}
+\end{equation}
+其中，虚位移 \( \delta u(x) \) 满足 Dirichlet 边界条件 \( \delta u(0) = 0 \)。弱形式 \eqref{eq:weak_form_galerkin_1d} 将强形式中的二阶导数降低为一阶导数，显著降低了试探函数和权函数（虚位移）的光滑性要求，为后续的数值离散化（如有限元法或伽辽金法）提供了基础。
+
+弱形式的推导过程体现了从强形式到积分形式的转化思想。通过引入虚位移 \( \delta u \)，弱形式不仅保留了原问题的物理意义，还允许在有限维函数空间中构造试探函数和测试函数，从而为数值求解提供了灵活性和便利性。在后续章节中，我们将基于此弱形式，进一步探讨伽辽金法的离散化实现及其在偏微分方程求解中的应用。
 
 \section{无网格离散化}
 \subsection*{构造无网格形函数}
@@ -533,7 +401,7 @@ Deep Ritz 方法在一维问题中表现出色，绝对误差保持在 \( 10^{-3
 
 \section{离散弱形式}
 
-将 \eqref{eq:discrete_u1} 和 \eqref{eq:virtual_displacement} 代入 \eqref{eq:weak_form_galerkin}：
+将 \eqref{eq:discrete_u1} 和 \eqref{eq:virtual_displacement} 代入 \eqref{eq:weak_form_galerkin_1d}：
 \[
     \int_0^l EA \left( \sum_{I=1}^N B_I(x) u_I \right) \left( \sum_{J=1}^N B_J(x) \delta u_J \right) \, dx = \int_0^l \left( \sum_{J=1}^N \Psi_J(x) \delta u_J \right) q \, dx + \left( \sum_{J=1}^N \Psi_J(l) \delta u_J \right) F
     \label{eq:weak_form_discrete}
@@ -697,7 +565,7 @@ c_m(\Psi_1) & c_m(\Psi_2) & \cdots & c_m(\Psi_{NP})
 
 
 \section{数值结果}
-考虑\eqref{eq:strong_form}两端固定的一维弹性杆问题，即
+考虑\eqref{eq:poisson_strong}两端固定的一维弹性杆问题，即
 \[
     \left\{
     \begin{array}{ll}
@@ -832,19 +700,19 @@ u(x) = \frac{x^2}{2} + \frac{x}{2}
         \label{tab:exact_vs_computed}
     \end{minipage}
 \end{figure}
-RKPM 方法在简单一维问题上具有较高的精度，绝对误差在 \( x = 0.9 \) 处达到最大值 0.004，平均误差约为 0.001，整体误差保持在 \( 10^{-3} \) 数量级，精度较高。与 Deep Ritz 方法相比 ，RKPM 方法的误差分布较为均匀。但RKPM方法的误差在边界附近（如 \( x = 0.9 \)）较大，而Deep Ritz 方法通过惩罚项能更有效地约束了边界条件。 
+RKPM 方法在简单一维问题上具有较高的精度，绝对误差在 \( x = 0.9 \) 处达到最大值 0.004，平均误差约为 0.001，整体误差保持在 \( 10^{-3} \) 数量级，精度较高。与 Deep 里兹 方法相比 ，RKPM 方法的误差分布较为均匀。但RKPM方法的误差在边界附近（如 \( x = 0.9 \)）较大，而Deep 里兹 方法通过惩罚项能更有效地约束了边界条件。 
 
-\chapter{再生核近似增强深度Ritz方法}
+\chapter{再生核近似增强深度里兹方法（RKDR方法）}
 
 \section{再生核近似增强}
 
-\subsection{标准深度 Ritz 方法}
-由第三章可知，标准深度 Ritz 方法基于变分原理求解PDE，其核心是将试探函数表示为神经网络\eqref{eq:network_output}\(u_{\theta}(x) = W_n h_{n-1} + b_n\),记作：
+\subsection{标准深度 里兹 方法}
+由第三章可知，标准深度 里兹 方法基于变分原理求解PDE，其核心是将试探函数表示为神经网络\eqref{eq:network_output}\(u_{\theta}(x) = W_n h_{n-1} + b_n\),记作：
 \begin{equation}
 u_\theta(x) = NN(x; \theta),
 \end{equation}
 
-其中 \(NN(x; \theta)\) 是一个全连接神经网络，输入为空间坐标 \(x \in \mathbb{R}^d\)，输出为标量 \(u_\theta(x)\)，\(\theta\) 是网络参数。深度Ritz法的本质在于利用神经网络的通用逼近能力，通过最小化能量泛函来近似 PDE 的解。
+其中 \(NN(x; \theta)\) 是一个全连接神经网络，输入为空间坐标 \(x \in \mathbb{R}^d\)，输出为标量 \(u_\theta(x)\)，\(\theta\) 是网络参数。深度里兹法的本质在于利用神经网络的通用逼近能力，通过最小化能量泛函来近似 PDE 的解。
 \begin{comment}
 对于泊松方程 \(-\nabla^2 u = f\)，其损失函数为：
 \begin{equation}
@@ -856,7 +724,7 @@ L(\theta) = \int_\Omega \left[ \frac{1}{2} |\nabla u_\theta|^2 - f u_\theta \rig
 
 
 \subsection{增强机制：MLS 形函数}
-增强型深度 Ritz 方法引入移动最小二乘法（MLS）形函数 \(\Psi(x)\) 来改进试探函数。MLS 形函数已在第四章详细推导，这里简述其构造：
+增强型深度 里兹 方法引入移动最小二乘法（MLS）形函数 \(\Psi(x)\) 来改进试探函数。MLS 形函数已在第四章详细推导，这里简述其构造：
 给定节点集 \(\{x_j\}_{j=1}^N\)，形函数定义为：
 \begin{equation}
 u_h(x) = \sum_{j=1}^N \Psi_j(x) u_j,
@@ -874,7 +742,7 @@ u_h(x) = \sum_{j=1}^N \Psi_j(x) u_j,
 \(A(x) = \sum_{j=1}^N \phi_j(x) p(x_j, x) p^T(x_j, x)\)，\(B(x) = [\phi_1(x) p(x_1, x), \dots, \phi_N(x) p(x_N, x)]\)。\\
 \end{comment}
 \subsection{神经网络模块与特征拼接}
-增强型 Ritz 方法的核心在于通过特征拼接整合 MLS 形函数与神经网络。试探函数构造为：
+增强型 里兹 方法的核心在于通过特征拼接整合 MLS 形函数与神经网络。试探函数构造为：
 \begin{equation}
 u_\theta(x) = NN(z(x); \theta), \quad z(x) = [x, \Psi(x)],
 \end{equation}
@@ -904,22 +772,22 @@ u_\theta(x) = NN([x, \Psi(x)]; \theta),
 \]
 其中 \(\Psi(x) = p^T(x, x) A^{-1}(x) B(x)\)。这种整合使网络同时具备局部插值（MLS）和全局非线性拟合（神经网络）的能力。
 
-基于 Ritz 变分原理，损失函数简化为：
+基于 里兹 变分原理，损失函数简化为：
 \begin{equation}
 \mathcal{L}(\theta) = \frac{1}{N_b} \sum_{i=1}^{N_b} \left[ \frac{1}{2} |\nabla u_\theta(x_i)|^2 - f(x_i) u_\theta(x_i) \right] + \lambda \left[ u_\theta(0)^2 + (u_\theta(1) - 1)^2 \right],
 \end{equation}
 其中 \(N_b\) 是内部采样点数，\(\lambda\) 是边界惩罚系数。详细推导见伽辽金无网格法章节。
 
 \section{训练算法}
-基于增强深度 Ritz 方法的大致步骤为\\
+基于增强深度 里兹 方法的大致步骤为\\
 1. 初始化：设定网络参数 \(\theta\)、节点集 \(\{x_I\}\)、支持域 \(s\)、学习率 \(\eta\)。\\
 2. 采样：随机生成内部点 \(\{x_i^b\}\) 和边界点 \(\{0, 1\}\)。\\
 3. 前向传播：计算 \(\Psi(x_i^b)\)，拼接特征 \(z(x_i^b)\)，输出 \(u_\theta(x_i^b)\) 和 \(\nabla u_\theta(x_i^b)\)。\\
 4. 损失计算：评估能量项和边界项，得到 \(\mathcal{L}(\theta)\)。\\
 5. 优化：通过反向传播更新 \(\theta\)，重复直到收敛。
-
+\begin{comment}
 \section{数值结果}
-考虑\eqref{eq:strong_form}两端固定的一维弹性杆问题，即
+考虑\eqref{eq:poisson_strong}两端固定的一维弹性杆问题，即
 \[
     \left\{
     \begin{array}{ll}
@@ -939,35 +807,35 @@ u(x) = \frac{x^2}{2} + \frac{x}{2}
 基于该一维问题构建一个深度神经网络，其中输入和输出维度分别为 1，网络包含宽度为 50 且深度为 1（总层数为 3）的全连接层，采用 $\tanh$ 激活函数；其次，利用 100 个内部采样点和 2 个边界点构造损失函数，其中体积分损失基于拉普拉斯方程的变分形式 $\int_0^1 \left( \frac{1}{2} |\frac{\partial u}{\partial x}|^2 - f u \right) dx$ 近似计算，边界损失通过惩罚系数 1000 强制满足 Dirichlet 边界条件 $u(0)=0$ 和 $u(1)=1$；然后，引入再生核增强模块，采用 11 个均匀分布的节点（间距 0.1）及支持域大小 0.2 的三次样条核函数，计算形状函数并将其与原始输入拼接，增强网络特征表达；最后，采用 Adam 优化器以初始学习率 0.001 并结合步长为 300、衰减因子 0.3 的 StepLR 调度器，在 10000 步训练中通过批量梯度下降优化损失函数，每 10 步记录一次误差，测试阶段则在 100 个积分点上评估 $L^2$ 和 $H^1$ 误差。
 
 \newpage
-\subsection{对比Deep Ritz方法}
+\subsection{对比Deep 里兹方法}
 \subsection*{训练精度对比}
 \begin{figure}[htbp]
     \centering
     \begin{subfigure}[b]{0.45\textwidth}
         \centering
         \includegraphics[width=\textwidth, height=6cm, keepaspectratio]{figures/3-1-4.png}
-        \caption{深度Ritz法1000步绝对误差}
+        \caption{深度里兹法1000步绝对误差}
         \label{fig:deepritz_solutions}
     \end{subfigure}
     \hfill
     \begin{subfigure}[b]{0.45\textwidth}
         \centering
         \includegraphics[width=\textwidth, height=6cm, keepaspectratio]{figures/5-1-2.png}
-        \caption{再生核增强深度Ritz法绝对误差}
+        \caption{再生核增强深度里兹法绝对误差}
         \label{fig:absolute_error}
     \end{subfigure}
     \\
     \begin{subfigure}[b]{0.45\textwidth}
         \centering
         \includegraphics[width=\textwidth, height=6cm, keepaspectratio]{figures/3-1-5.png}
-        \caption{深度Ritz法1000步H1误差}
+        \caption{深度里兹法1000步H1误差}
         \label{fig:deepritz_solutions}
     \end{subfigure}
     \hfill
     \begin{subfigure}[b]{0.45\textwidth}
         \centering
         \includegraphics[width=\textwidth, height=6cm, keepaspectratio]{figures/5-1-5.png}
-        \caption{再生核增强深度Ritz法1000步H1误差}
+        \caption{再生核增强深度里兹法1000步H1误差}
         \label{fig:absolute_error}
     \end{subfigure}
     \centering
@@ -975,9 +843,9 @@ u(x) = \frac{x^2}{2} + \frac{x}{2}
     \label{fig:combined}
 \end{figure}
 
-1000 步训练后深度 Ritz 方法的 L2 误差为 0.11，解的整体逼近精度较低。绝对误差分布呈现对称抛物线形状，误差集中在 \( x = 0.2 \) 到 \( x = 0.8 \) 的区域。相比之下，增强深度 Ritz 方法将 L2 误差降低至 0.002。绝对误差分布峰值更小，变化平滑，表明引入 EFG 形状函数显著提升了局部逼近能力。
+1000 步训练后深度 里兹 方法的 L2 误差为 0.11，解的整体逼近精度较低。绝对误差分布呈现对称抛物线形状，误差集中在 \( x = 0.2 \) 到 \( x = 0.8 \) 的区域。相比之下，增强深度 里兹 方法将 L2 误差降低至 0.002。绝对误差分布峰值更小，变化平滑，表明引入 EFG 形状函数显著提升了局部逼近能力。
 
-1000步训练后深度 Ritz 方法的梯度误差（红色曲线）远高于函数值误差（蓝色曲线），表明模型在捕捉解的导数方面表现较差。再生核增强后 H1 误差显著降低。尽管梯度误差仍高于函数值误差，但其幅度大幅减小，表明 EFG 提升了模型对解导数的逼近能力。
+1000步训练后深度 里兹 方法的梯度误差（红色曲线）远高于函数值误差（蓝色曲线），表明模型在捕捉解的导数方面表现较差。再生核增强后 H1 误差显著降低。尽管梯度误差仍高于函数值误差，但其幅度大幅减小，表明 EFG 提升了模型对解导数的逼近能力。
 
 \newpage
 \begin{figure}[htbp]
@@ -985,7 +853,7 @@ u(x) = \frac{x^2}{2} + \frac{x}{2}
     \begin{subfigure}[b]{0.45\textwidth}
         \centering
         \includegraphics[width=\textwidth, height=6cm, keepaspectratio]{figures/3-2-4.png}
-        \caption{深度Ritz法10000步L2误差}
+        \caption{深度里兹法10000步L2误差}
         \label{fig:deepritz_solutions}
     \end{subfigure}
     \hfill
@@ -999,7 +867,7 @@ u(x) = \frac{x^2}{2} + \frac{x}{2}
     \begin{subfigure}[b]{0.45\textwidth}
         \centering
         \includegraphics[width=\textwidth, height=6cm, keepaspectratio]{figures/3-2-5.png}
-        \caption{深度Ritz法10000步H1误差}
+        \caption{深度里兹法10000步H1误差}
         \label{fig:deepritz_solutions}
     \end{subfigure}
     \hfill
@@ -1014,7 +882,7 @@ u(x) = \frac{x^2}{2} + \frac{x}{2}
     \label{fig:combined}
 \end{figure}
 
-10000 步训练后，DeepRitz 方法的 L2 误差和 H1 误差分别为 0.016 和 0.080，相较 1000 步（0.25 和 0.5）显著降低，但中间区域 L2 误差较大，边界处导数误差显著；RK-DeepRitz 方法的 L2 误差和 H1 误差为 0.0024 和 0.049，相较 1000 步（0.1 和 0.2）显著降低，误差分布波动较多但整体更低，优于 DeepRitz。
+10000 步训练后，Deep里兹 方法的 L2 误差和 H1 误差分别为 0.016 和 0.080，相较 1000 步（0.25 和 0.5）显著降低，但中间区域 L2 误差较大，边界处导数误差显著；RK-Deep里兹 方法的 L2 误差和 H1 误差为 0.0024 和 0.049，相较 1000 步（0.1 和 0.2）显著降低，误差分布波动较多但整体更低，优于 Deep里兹。
 
 \subsection*{误差收敛效果}
 
@@ -1023,7 +891,7 @@ u(x) = \frac{x^2}{2} + \frac{x}{2}
     \begin{subfigure}[b]{0.45\textwidth}
         \centering
         \includegraphics[width=\textwidth, height=6cm, keepaspectratio]{figures/3-1-6.png}
-        \caption{深度Ritz法1000步误差收敛曲线}
+        \caption{深度里兹法1000步误差收敛曲线}
         \label{fig:deepritz_solutions}
     \end{subfigure}
     \hfill
@@ -1039,14 +907,14 @@ u(x) = \frac{x^2}{2} + \frac{x}{2}
     \label{fig:combined}
 \end{figure}
 
-DeepRitz 方法初始 L2 误差和 H1 误差较高（2.0 和 1.75），前 200 步下降至 0.5 和 0.75，最终稳定在 0.25 和 0.5，但存在波动且导数拟合较弱；RK-DeepRitz 方法初始误差较低（1.4-1.6），收敛更快，最终误差降至 0.1 和 0.2，训练更稳定，H1 误差与 L2 误差差距较小，显示出再生核增强对函数值和导数拟合的显著改进。
+Deep里兹 方法初始 L2 误差和 H1 误差较高（2.0 和 1.75），前 200 步下降至 0.5 和 0.75，最终稳定在 0.25 和 0.5，但存在波动且导数拟合较弱；RK-Deep里兹 方法初始误差较低（1.4-1.6），收敛更快，最终误差降至 0.1 和 0.2，训练更稳定，H1 误差与 L2 误差差距较小，显示出再生核增强对函数值和导数拟合的显著改进。
 
 \begin{figure}[htbp]
     \centering
     \begin{subfigure}[b]{0.45\textwidth}
         \centering
         \includegraphics[width=\textwidth, height=6cm, keepaspectratio]{figures/3-2-6.png}
-        \caption{深度Ritz法10000步误差收敛曲线}
+        \caption{深度里兹法10000步误差收敛曲线}
         \label{fig:deepritz_solutions}
     \end{subfigure}
     \hfill
@@ -1061,7 +929,7 @@ DeepRitz 方法初始 L2 误差和 H1 误差较高（2.0 和 1.75），前 200 �
     \caption{10000步误差收敛可视化}
     \label{fig:combined}
 \end{figure}
-DeepRitz 方法经训练后误差显著降低，但导数拟合仍为瓶颈。RK-DeepRitz 方法收敛更快，精度更高。
+Deep里兹 方法经训练后误差显著降低，但导数拟合仍为瓶颈。RK-Deep里兹 方法收敛更快，精度更高。
 \subsection{计算时间对比}
 \begin{figure}[ht]
     \centering
@@ -1086,7 +954,7 @@ DeepRitz 方法经训练后误差显著降低，但导数拟合仍为瓶颈。RK
         ]
         \addplot[fill=blue!50] coordinates {(1000 步, 3.36) (10000 步, 34.79) };
         \addplot[fill=green!50] coordinates {(1000 步, 23.95) (10000 步, 244.76) }; % 添加 20000 步数据，假设为 0
-        \legend{DeepRitz 方法, RK-DeepRitz 方法}
+        \legend{Deep里兹 方法, RK-Deep里兹 方法}
         \end{axis}
         \end{tikzpicture}
     \end{minipage}
@@ -1110,10 +978,10 @@ DeepRitz 方法经训练后误差显著降低，但导数拟合仍为瓶颈。RK
             width=\textwidth,
             height=6cm
         ]
-        \addplot[fill=blue!50] coordinates {(1000 步, 0.001) (10000 步, 0.0015)}; % DeepRitz 计算时间
-        \addplot[fill=green!50] coordinates {(1000 步, 0.01) (10000 步, 0.01)}; % RK-DeepRitz 计算时间
+        \addplot[fill=blue!50] coordinates {(1000 步, 0.001) (10000 步, 0.0015)}; % Deep里兹 计算时间
+        \addplot[fill=green!50] coordinates {(1000 步, 0.01) (10000 步, 0.01)}; % RK-Deep里兹 计算时间
         \addplot[fill=red!50] coordinates {(伽辽金无网格, 0.3)}; % 伽辽金无网格计算时间
-        \legend{DeepRitz 方法, RK-DeepRitz 方法, 伽辽金无网格方法}
+        \legend{Deep里兹 方法, RK-Deep里兹 方法, 伽辽金无网格方法}
         \end{axis}
         \end{tikzpicture}
     \end{minipage}
@@ -1121,7 +989,7 @@ DeepRitz 方法经训练后误差显著降低，但导数拟合仍为瓶颈。RK
     \label{fig:time_comparison}
 \end{figure}
     
-    从图 \ref{fig:time_comparison} 可以看出，DeepRitz 方法的训练时间随步数增加显著增长，而 RK-DeepRitz 方法训练时间更长，反映了再生核增强引入的额外计算开销。
+    从图 \ref{fig:time_comparison} 可以看出，Deep里兹 方法的训练时间随步数增加显著增长，而 RK-Deep里兹 方法训练时间更长，反映了再生核增强引入的额外计算开销。
 
 \newpage
 \subsection{对比RKPM方法}
@@ -1168,9 +1036,9 @@ DeepRitz 方法经训练后误差显著降低，但导数拟合仍为瓶颈。RK
     \caption{L2误差对比}
     \label{fig:combined}
 \end{figure}
-RKPM 方法的误差分布平滑但边界处导数误差较大；RK-DeepRitz 方法的误差分布波动较大但精度更高，导数误差波动性强。RK-DeepRitz 结合深度学习显著提升了 L2 误差的拟合能力，但导数拟合较弱.
+RKPM 方法的误差分布平滑但边界处导数误差较大；RK-Deep里兹 方法的误差分布波动较大但精度更高，导数误差波动性强。RK-Deep里兹 结合深度学习显著提升了 L2 误差的拟合能力，但导数拟合较弱.
 
-\begin{comment}
+
 \subsection{小结}
 \begin{figure}[htbp]
     \centering
@@ -1215,15 +1083,226 @@ RKPM 方法的误差分布平滑但边界处导数误差较大；RK-DeepRitz 方
 \end{figure}
 \end{comment}
 
+\chapter{算例分析}
+在深度 里兹 方法的训练过程中，为了避免过拟合或不必要的计算，我们设计了一个基于损失函数收敛性的停止机制。该机制通过监控最近若干步的损失值变化来判断模型是否已达到稳定状态，并在满足条件时提前终止训练。
+
+设训练过程中的损失函数为 \( L(\theta) \)，其中 \( \theta \) 表示模型参数。停止机制的核心思想是：在连续的 \( w \) 步（称为窗口大小）内，如果损失值的最大变化小于预设阈值 \( \tau \)，则认为模型已收敛，训练应停止。
+
+在实现中，我们设置：窗口大小 \( w = 100 \)，收敛阈值 \( \tau = 10^{-5} \)。
+
+考虑\eqref{eq:poisson_strong}两端固定的一维弹性杆问题，即
+\[
+    \left\{
+    \begin{array}{ll}
+        \nabla^2 u - q = 0 & \mathrm{in~} (0, l) \\
+        u(0) =u(1)= 0 
+    \end{array}
+    \right.
+    \label{eq:strong_form1}
+\]
+
+该问题的解析解为：
+\begin{equation}
+u(x) = \frac{x^2}{2} + \frac{x}{2}
+\label{eq:analytical_solution}
+\end{equation}
+
+基于该一维问题构建一个深度神经网络，其中输入和输出维度分别为 1，网络包含宽度为 50 且深度为 1（总层数为 3）的全连接层，采用 $\tanh$ 激活函数；其次，利用 100 个内部采样点和 2 个边界点构造损失函数，其中体积分损失基于拉普拉斯方程的变分形式 $\int_0^1 \left( \frac{1}{2} |\frac{\partial u}{\partial x}|^2 - f u \right) dx$ 近似计算，边界损失通过惩罚系数 1000 强制满足 Dirichlet 边界条件 $u(0)=0$ 和 $u(1)=1$；
+
+
+
+
+再生核增强里兹方法采用增强模块，通过 11 个均匀分布的节点（间距 0.1）及支持域大小 0.2 的三次样条核函数，计算形状函数并将其与原始输入拼接，增强网络特征表达；
+
+采用 Adam 优化器以初始学习率 0.001，讨论两方法在不同SteoLR调度测略下的收敛情况，如图\ref{fig:stepsize} 所示 DR方法取步长为5000，RKDR方法取步长为300，获得最快损失函数收敛速度。此外，DR 方法和RKDR方法损失函数最终稳定在 0.96 左右，DR损失下降过程较为平滑，在约 12000 步时收敛。RKDR 方法损失迅速下降，在600步左右收敛，且收敛后的损失值更低。
+
+
+
+\begin{figure}[htbp]
+    \centering
+    \begin{subfigure}[b]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth, height=6.5cm, keepaspectratio]{figures2/DRstepsize.png}
+        \caption{DR方法收敛步数}
+        \label{fig:3-4-3}
+    \end{subfigure}
+    \hspace{0.5em} % 减小水平间距
+    \begin{subfigure}[b]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth, height=6.5cm, keepaspectratio]{figures2/RKDRstepsize.png}
+        \caption{RKDR方法收敛步数}
+        \label{fig:5-3-4}
+    \end{subfigure}
+
+    \caption{两方法收敛损失函数图像}
+    \label{fig:stepsize}
+\end{figure}
+
+
+为了对比深度 里兹 方法（DR）和增强深度 里兹 方法（RKDR）在相同训练步数下的收敛性能，我们将两种方法的训练步数统一设置为 15000 步，并绘制损失随训练步数的变化曲线。
+\begin{figure}[htbp]
+    \centering
+    \begin{subfigure}[b]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth, height=6.5cm, keepaspectratio]{figures2/100stepsloss.png}
+        \caption{0-100步损失函数对比}
+        \label{fig:100stepsloss}
+    \end{subfigure}
+    \hspace{0.5em} % 减小水平间距
+    \begin{subfigure}[b]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth, height=6.5cm, keepaspectratio]{figures2/allstepsloss.png}
+        \caption{100-15000步损失函数对比}
+        \label{fig:allstepsloss}
+    \end{subfigure}
+
+    \caption{15000步损失函数图像}
+    \label{fig:combined_loss}
+\end{figure}
+
+
+图 \ref{fig:combined_loss} a显示，在前 100 步内，RKDR 方法的初始损失较低，但两者的下降速度相似，最终在 100 步左右都下降到 1，表明在训练初期两者的优化效率相当。
+
+图 \ref{fig:combined_loss} b显示，RKDR 方法从第 100 步到第 200 步，损失快速下降至0.96，几乎没有波动，表明 RKDR 方法在 200 步后已完全收敛，表现出极高的稳定性。
+而DR方法在 100 步到 15000 步之间，损失继续缓慢下降，最终在 15000 步左右稳定在 0.96 左右，但存在微小波动，尤其在 5000 步到 10000 步之间有轻微起伏。
+
+在图 \ref{fig:abs_error} 中，我们对比了 DR 和 RKDR 方法的绝对误差分布。对于 DR 方法，其绝对误差在 \( x \in [0, 0.2] \) 和 \( x \in [0.8, 1.0] \) 区域内较小，但在 \( x \in [0.2, 0.8] \) 区域内波动较大，最大误差接近 0.14，特别是在 \( x \approx 0.5 \) 附近达到峰值。这表明 DR 方法对解的全局拟合不足。相比之下，RKDR 方法的绝对误差整体波动较小，最大误差仅约为 0.06，远低于 DR 方法。RKDR 的误差分布较为均匀，没有明显的峰值，表明其在整个定义域内对解的逼近更加一致和精确。说明RKDR 方法通过引入再生核增强，改善了神经网络的逼近能力，特别是在解的局部变化较大的区域（如 \( x \approx 0.5 \)），能够更好地捕捉解的细节，从而显著减小绝对误差。
+
+图 \ref{fig:gradient_error} 展示了梯度误差的对比结果。梯度误差反映了解的导数逼近精度，RKDR 方法通过再生核的数学完备性，增强了神经网络对导数的拟合能力，特别是在边界附近和解变化剧烈的区域，表现出更高的精度和稳定性。
+
+\begin{comment}
+
+
+\begin{figure}[htbp]
+    \centering
+    \begin{subfigure}[b]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth, height=6.5cm, keepaspectratio]{figures2/Abserror.png}
+        \caption{绝对误差对比}
+        \label{fig:abs_error}
+    \end{subfigure}
+    \hspace{0.5em} % 减小水平间距
+    \begin{subfigure}[b]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth, height=6.5cm, keepaspectratio]{figures2/gradienterror.png}
+        \caption{梯度误差对比}
+        \label{fig:gradient_error}
+    \end{subfigure}
+
+    \vspace{1em} % 控制两行子图之间的垂直间距
+    \begin{subfigure}[b]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth, height=6.5cm, keepaspectratio]{figures2/l2error.png}
+        \caption{L2误差变化}
+        \label{fig:l2_error}
+    \end{subfigure}
+    \hspace{0.5em} % 减小水平间距
+    \begin{subfigure}[b]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth, height=6.5cm, keepaspectratio]{figures2/h1error.png}
+        \caption{H1误差变化}
+        \label{fig:h1_error}
+    \end{subfigure}
+
+    \caption{两算法误差对比}
+    \label{fig:error_comparison1}
+\end{figure}
+\end{comment}
+\begin{figure}[htbp]
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+        \includegraphics[width=\textwidth, height=5cm, keepaspectratio]{figures2/Abserror.png}
+        \caption{绝对误差对比}
+        \label{fig:abs_error}
+    \end{subfigure}
+    \hfill % 自动填充间距
+    \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+        \includegraphics[width=\textwidth, height=5cm, keepaspectratio]{figures2/gradienterror.png}
+        \caption{梯度误差对比}
+        \label{fig:gradient_error}
+    \end{subfigure}
+    \caption{两算法的绝对误差和梯度误差对比}
+    \label{fig:abs_gradient_error}
+\end{figure}
+
+
+\begin{figure}[htbp]
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+        \includegraphics[width=\textwidth, height=5cm, keepaspectratio]{figures2/l2error.png}
+        \caption{L2误差变化}
+        \label{fig:l2_error}
+    \end{subfigure}
+    \hfill % 自动填充间距
+    \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+        \includegraphics[width=\textwidth, height=5cm, keepaspectratio]{figures2/h1error.png}
+        \caption{H1误差变化}
+        \label{fig:h1_error}
+    \end{subfigure}
+    \caption{两算法的L2误差和H1误差变化}
+    \label{fig:l2_h1_error}
+\end{figure}
+
+\begin{figure}[htbp]
+    \centering
+    \begin{subfigure}[b]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth, height=6.5cm, keepaspectratio]{figures2/traintime2.png}
+        \caption{训练时间对比}
+        \label{fig:100stepsloss}
+    \end{subfigure}
+    \hspace{0.5em} % 减小水平间距
+    \begin{subfigure}[b]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth, height=6.5cm, keepaspectratio]{figures2/translatetime.png}
+        \caption{计算时间对比}
+        \label{fig:allstepsloss}
+    \end{subfigure}
+
+    \caption{时间对比}
+    \label{fig:time}
+\end{figure}
+
+
+对于 DR 方法，其训练时间随步数增加呈现较为平缓的线性增长趋势。在 20000 步时，DR 方法的训练时间约为 100 秒，表明其训练过程较为稳定，整体耗时较短。相比之下，由于再生核增强引入了额外的计算复杂度，RKDR 方法的训练时间增长速度显著更快，在 20000 步时达到约 500 秒。这表明 RKDR 方法在训练过程中的单步计算成本高于 DR 方法。
+
+然而，结合收敛数据，DR 方法需要 13210 步（51.09 秒）才能收敛，而 RKDR 方法仅需 670 步（14.47 秒）。尽管 RKDR 方法的单步训练时间较高，但其收敛速度远快于 DR 方法。RKDR 方法的实际训练用时远低于 DR 方法，这表明 RKDR 方法通过更快的收敛速度，显著降低了总体训练时间，展现了更高的计算效率。
+
+从理论角度看，RKDR 方法通过引入再生核，增强了神经网络的逼近能力，使其能够更快地逼近最优解，从而减少了所需的训练步数。再生核的数学完备性不仅提高了逼近精度（见之前的误差分析），还优化了训练过程，使 RKDR 方法在计算效率上具有显著优势。
+
+\begin{figure}[htbp]
+    \centering
+    \begin{subfigure}[b]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth, height=6.5cm, keepaspectratio]{figures2/3-7-1.png}
+        \caption{DR方法收敛预测情况}
+        \label{fig:allstepsloss}
+    \end{subfigure}
+    \hspace{0.5em} % 减小水平间距
+    \begin{subfigure}[b]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth, height=6.5cm, keepaspectratio]{figures2/5-5-1.png}
+        \caption{RKDR方法收敛预测情况}
+        \label{fig:allstepsloss}
+    \end{subfigure}
+     \caption{收敛时间对比}
+    \label{fig:shouliantime}
+\end{figure}
 
 \chapter{结论}
-本文提出的再生核增强深度 Ritz 法（RK-DeepRitz）融合深度学习与无网格方法，基于 Ritz 变分原理，通过再生核增强提升偏微分方程求解的精度与效率。方法在深度神经网络框架下引入再生核近似，针对一维问题实现显著的 $L^2$ 误差降低，展现出较高的推理效率与应用潜力。
 
-首先，深度 Ritz 方法以Ritz方法为基础，通过预定义基函数近似位移场，而深度 Ritz 方法利用神经网络替代试函数，验证了其数值有效性。其次，伽辽金无网格法（RKPM）从弱形式出发，通过无网格离散化构造形状函数，结合拉格朗日乘子法强制边界条件并采用高斯积分法近似积分，显示出较好的导数拟合能力。最后，本文主要实现再生核近似增强深度 Ritz 法，通过再生核近似机制增强局部解表达能力，验证了方法的优越性。
 
-尽管增强方法性能优于原始深度 Ritz 方法，但 H1 误差中的梯度误差仍较高。这可能是由于网络深度或宽度不足，或训练步数有限（1000 步可能不足以充分收敛）。建议增加训练步数（例如到 5000 或 10000 步）或调整超参数（如学习率、惩罚系数）以进一步优化梯度逼近。
+本文提出的再生核增强深度 里兹 法（RK-Deep里兹）融合深度学习与无网格方法，基于 里兹 变分原理，通过再生核增强提升偏微分方程求解的精度与效率。方法在深度神经网络框架下引入再生核近似，针对一维问题实现显著的 $L^2$ 误差降低，展现出较高的推理效率与应用潜力。
 
-RK-DeepRitz 方法在 $L^2$ 误差上优于 RKPM 和 DeepRitz，在 $H^1$ 误差上低于 DeepRitz 但高于 RKPM，中间区域精度更高，导数误差波动较大，边界处需优化。训练时间较长但计算时间远低于 RKPM，验证了推理效率优势，为复杂偏微分方程求解提供了高效工具。增强深度 Ritz 方法通过 EFG 形状函数提升表达能力，适合处理复杂梯度变化问题。增强方法性能优于原始方法，但 $H^1$ 梯度误差仍较高，建议增加训练步数或调整超参数以优化梯度逼近。
+首先，深度 里兹 方法以里兹方法为基础，通过预定义基函数近似位移场，而深度 里兹 方法利用神经网络替代试函数，验证了其数值有效性。其次，伽辽金无网格法（RKPM）从弱形式出发，通过无网格离散化构造形状函数，结合拉格朗日乘子法强制边界条件并采用高斯积分法近似积分，显示出较好的导数拟合能力。最后，本文主要实现再生核近似增强深度 里兹 法，通过再生核近似机制增强局部解表达能力，验证了方法的优越性。
+
+RKDR 方法在 700 步内（14.47s）即达到完全收敛，而DR 方法需要 12000 步（51.09s）才能稳定，表明 DR 方法在收敛速度上显著优于 RKDR 方法，尽管增强方法性能优于原始深度 里兹 方法，但 H1 误差中的梯度误差仍较高。
+
+RKDR方法在 $L^2$ 误差上优于 RKPM 和 Deep里兹，在 $H^1$ 误差上低于 Deep里兹 但高于 RKPM，中间区域精度更高，导数误差波动较大，边界处需优化。训练时间较长但计算时间远低于 RKPM，验证了推理效率优势，为复杂偏微分方程求解提供了高效工具。增强深度 里兹 方法通过 EFG 形状函数提升表达能力，适合处理复杂梯度变化问题。增强方法性能优于原始方法，但 $H^1$ 梯度误差仍较高。
 
 
 
